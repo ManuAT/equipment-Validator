@@ -1,7 +1,8 @@
 import React,{useState} from 'react'
 import { Grid,Input,Select } from 'react-spreadsheet-grid'
 import { v4 as uuidv4 } from 'uuid';
-
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 export default function ExcelView({data,columnsName}) {
 
     // console.log(data,columnsName);
@@ -16,7 +17,7 @@ export default function ExcelView({data,columnsName}) {
     // ];
 
     const rows2 = row2
-    console.log(rows2);
+    // console.log(rows2);
 
     const somePositions =[{
         id: 'nectarit',
@@ -55,7 +56,7 @@ export default function ExcelView({data,columnsName}) {
     const onFieldChange = (rowId, field) => (value) => {
         // Find the row that is being changed
         const row = rows.find( (id)  => id.id === rowId);
-        console.log("row",row,value);
+        // console.log("row",row,value);
         // Change a value of a field
         row[field] = value;
         setRows([].concat(rows))
@@ -297,26 +298,70 @@ export default function ExcelView({data,columnsName}) {
 
      // Change columns width values in the state to not lose them.
      const onColumnResize = (widthValues) => {
-        console.log(widthValues);
+      const newColumns = [].concat(columns)
+      Object.keys(widthValues).forEach((columnId) => {
+          const column = columns.find(({ id }) => id == columnId);
+          column.width = widthValues[columnId]
+      })
+      setColumns(newColumns)
+  }
 
-         const newColumns = [].concat(columns).map(obj=> ({ ...obj, width:0 }))
-         Object.keys(widthValues).forEach((columnId) => {
-             newColumns[columnId].width = widthValues[columnId]
-         })
+  const handleDownload = e =>{
+ 
+        var wb = XLSX.utils.book_new();
 
-         console.log(newColumns);
+        wb.Props = {
+          Title: "SheetJS Tutorial",
+          Subject: "Test",
+          Author: "Manu",
+          CreatedDate: new Date(2017,12,19)
+          };
+      
+          wb.SheetNames.push("sheet1");
 
-        setColumns(newColumns)
+          // var ws_data = [{clinet:"name"},{client:"manu22"}];
+          var rowData = [].concat(rows)
 
-     }
+
+          var ws = XLSX.utils.json_to_sheet(rowData.map(({id, ...remainingAttrs}) => remainingAttrs));
+
+          wb.Sheets["sheet1"] = ws;
+
+          var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
+
+            function s2ab(s) { 
+              var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+              var view = new Uint8Array(buf);  //create uint8array as viewer
+              for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+              return buf;    
+            }
+
+            // var excelBlob = new Blob([s2ab(wbout)],{type:"application/octet-stream"}, 'test.xlsx');
+            // var link=window.URL.createObjectURL(excelBlob);
+            // window.location=link;
+            saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'test.xlsx');
+            
+            
+          // console.log("Download",rows,columnsName);
+  }
 
     return (
+      <div style={{ height: '800px' }}>
+        <div>
+        <h3>download excel</h3>
+        <button onClick={handleDownload}>download</button>
+        </div>
         <Grid
             columns={initColumns()}
             rows={rows}
             isColumnsResizable
+            isScrollable
+            columnWidthValues
+            // focusOnSingleClick
+            placeholder
             onColumnResize={onColumnResize}
             getRowKey={row => row.id}
         />
+        </div>
     )
 }

@@ -59,8 +59,10 @@ function App() {
       /* Parse data */
       const bstr = evt.target.result;
       const wb = XLSX.read(bstr, { type: 'binary' });
+      // console.log(wb);
       /* Get first worksheet */
       const wsname = wb.SheetNames[0];
+
       const ws = wb.Sheets[wsname];
       /* Convert array of arrays */
       const data = XLSX.utils.sheet_to_csv(ws, { header: 1 });
@@ -71,7 +73,7 @@ function App() {
 
   return (
     <div>
-      <h3>Upload csv</h3>
+      <h3>Upload csv/excel</h3>
       <input
         type="file"
         accept=".csv,.xlsx,.xls"
