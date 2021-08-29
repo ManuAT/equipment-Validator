@@ -222,6 +222,11 @@ export default function ExcelView({data,columnsName}) {
         id:11,
         title: () => 'servingToData',
         value: (row, { focus }) => {
+            console.log("focus status",focus);
+            // focus ? alert(row.servingToData+""):null
+            if(focus)
+              alert(row.servingToData)
+
             return (
 
               <Input type="text"
@@ -244,7 +249,8 @@ export default function ExcelView({data,columnsName}) {
               focus = {focus}
             />
             );
-        }
+        },
+        
       },
       {
         id:13,
@@ -319,7 +325,6 @@ export default function ExcelView({data,columnsName}) {
       
           wb.SheetNames.push("sheet1");
 
-          // var ws_data = [{clinet:"name"},{client:"manu22"}];
           var rowData = [].concat(rows)
 
 
@@ -335,14 +340,7 @@ export default function ExcelView({data,columnsName}) {
               for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
               return buf;    
             }
-
-            // var excelBlob = new Blob([s2ab(wbout)],{type:"application/octet-stream"}, 'test.xlsx');
-            // var link=window.URL.createObjectURL(excelBlob);
-            // window.location=link;
             saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'test.xlsx');
-            
-            
-          // console.log("Download",rows,columnsName);
   }
 
     return (
