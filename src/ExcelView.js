@@ -235,7 +235,8 @@ export default function ExcelView({data,columnsName}) {
               focus = {focus}
             />
             );
-        }
+        },
+        width:12
       },
       {
         id:12,
@@ -250,7 +251,7 @@ export default function ExcelView({data,columnsName}) {
             />
             );
         },
-        
+        width:12
       },
       {
         id:13,
@@ -345,7 +346,7 @@ export default function ExcelView({data,columnsName}) {
 
     return (
       <div style={{ height: '800px' }}>
-        <div>
+        <div className="downloadBtn" style={{float:'right',marginTop:'-96px'}}>
         <h3>download excel</h3>
         <button onClick={handleDownload}>download</button>
         </div>

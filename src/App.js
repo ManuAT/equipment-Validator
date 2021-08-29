@@ -59,7 +59,6 @@ function App() {
       /* Parse data */
       const bstr = evt.target.result;
       const wb = XLSX.read(bstr, { type: 'binary' });
-      // console.log(wb);
       /* Get first worksheet */
       const wsname = wb.SheetNames[0];
 
@@ -73,12 +72,17 @@ function App() {
 
   return (
     <div>
+      <div className="tittle" style={{position:'absolute',marginLeft:'40%'}}>
+        <h2>Nectar Oboarding Validator</h2>
+      </div>
+      <div className="uploadBtn" style={{marginTop:'20px',marginBottom:'12px'}}>
       <h3>Upload csv/excel</h3>
       <input
         type="file"
         accept=".csv,.xlsx,.xls"
         onChange={handleFileUpload}
       />
+      </div>
       {data.length>0 ? <ExcelView data={data} columnsName={columnsName}/> : null}
       {/* <ExcelView data={data} columnsName={columnsName}/> */}
     </div>
