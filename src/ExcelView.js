@@ -21,9 +21,10 @@ export default function ExcelView({data,columnsName}) {
     const [show, setShow] = useState(false);
     const [dataToModal, setdataToModal] = useState();
 
-    const handleClose = () => setShow(false);
+    const handleClose = () => setShow(false)
+                               
     const handleShow = () => setShow(true);
-    console.log({show});
+    // console.log({show});
     // -------temporary-dropDown----------
 
     const somePositions =[{
@@ -69,6 +70,16 @@ export default function ExcelView({data,columnsName}) {
         row[field] = value;
         setRows([].concat(rows))
     }
+
+    const onFieldChange2 = (rowId, field) => (value) => {
+      // Find the row that is being changed
+      const row = rows.find( (id)  => id.id == rowId);
+      // console.log("row",row,value);
+      // Change a value of a field
+      row[field] = value.target.value;
+      setRows([].concat(rows))
+    }
+    
     
     // ------colunm array-----------
     const initColumns = () => [
@@ -231,11 +242,11 @@ export default function ExcelView({data,columnsName}) {
         id:11,
         title: () => 'servingToData',
         value: (row, { focus,active }) => {
-            console.log("focus status",focus,active)
-           if(focus)
+            // console.log("focus status",focus,active)
+           if(focus){
             handleShow()
-            // const dataModal = row.servingToData
-            setdataToModal(row.servingToData+"&"+"servingToData")
+            setdataToModal(row.servingToData+"&"+"servingToData"+'&'+row.id)
+           }
             return(
               <Input type="text"
               value={row.servingToData}
@@ -380,7 +391,8 @@ export default function ExcelView({data,columnsName}) {
                   as="textarea"
                   placeholder="Leave a comment here"
                   style={{ height: '400px' }}
-                  value = {dataToModal.split('&')[0]}
+                  value = {(rows.find( (id)  => id.id == dataToModal.split('&')[2]))[dataToModal.split('&')[1]]}
+                  onChange={onFieldChange2(dataToModal.split('&')[2],dataToModal.split('&')[1])}
                 />
               </FloatingLabel>
                
