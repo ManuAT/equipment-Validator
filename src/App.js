@@ -84,7 +84,6 @@ function App() {
       />
       </div>
       {data.length>0 ? <ExcelView data={data} columnsName={columnsName}/> : null}
-      {/* <ExcelView data={data} columnsName={columnsName}/> */}
     </div>
   );
 }

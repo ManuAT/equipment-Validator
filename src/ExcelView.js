@@ -3,13 +3,12 @@ import { Grid,Input,Select } from 'react-spreadsheet-grid'
 import { v4 as uuidv4 } from 'uuid';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { Button,Modal,FloatingLabel,Form } from 'react-bootstrap';
 export default function ExcelView({data,columnsName}) {
-
+    // -------INPUT data handle
     // console.log(data,columnsName);
     var row2 =[]
     row2 = data.map(obj=> ({ ...obj, id: uuidv4() }))
-
-
     // const rows1 = [
     //     { id: uuidv4(), client: 'nectar', deviceId: 'Win-3470-EF83-AAC7-0016', community:"downtown" ,siteName:'OTCI Attareen',equipmentName:'ATREN 1F FCU Lift Lobby Core A',equipmentType:'FanCoilUnit',assetCode:'0187902',pointsData:'Run Status@BMS Schedule Enable@Manual Occupancy@Return Temperature@Space Humidity@Valve Position@Supervisory Fan Speed@Fan Operation Command@Return Temperature Setpoint@Unoccupied Setpoint'},
     //     { id: uuidv4(), client: 'nectar', deviceId: 'Win-3470-EF83-AAC7-0016', community:"downtown" ,siteName:'OTCI Attareen',equipmentName:'ATREN 1F FCU Lift Lobby Core A',equipmentType:'FanCoilUnit',assetCode:'0187902',pointsData:'Run Status@BMS Schedule Enable@Manual Occupancy@Return Temperature@Space Humidity@Valve Position@Supervisory Fan Speed@Fan Operation Command@Return Temperature Setpoint@Unoccupied Setpoint'}
@@ -17,7 +16,15 @@ export default function ExcelView({data,columnsName}) {
     // ];
 
     const rows2 = row2
-    // console.log(rows2);
+
+    // ---------handle Modal ------------
+    const [show, setShow] = useState(false);
+    const [dataToModal, setdataToModal] = useState();
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+    console.log({show});
+    // -------temporary-dropDown----------
 
     const somePositions =[{
         id: 'nectarit',
@@ -49,6 +56,7 @@ export default function ExcelView({data,columnsName}) {
     
   ]
 
+  // ----------handle rowChange-------
     const [rows, setRows] = useState(rows2);
     
     // A callback called every time a value changed.
@@ -62,6 +70,7 @@ export default function ExcelView({data,columnsName}) {
         setRows([].concat(rows))
     }
     
+    // ------colunm array-----------
     const initColumns = () => [
       {
         id:0,
@@ -221,20 +230,23 @@ export default function ExcelView({data,columnsName}) {
       {
         id:11,
         title: () => 'servingToData',
-        value: (row, { focus }) => {
-            console.log("focus status",focus);
-            // focus ? alert(row.servingToData+""):null
-            if(focus)
-              alert(row.servingToData)
-
-            return (
-
+        value: (row, { focus,active }) => {
+            console.log("focus status",focus,active)
+           if(focus)
+            handleShow()
+            // const dataModal = row.servingToData
+            setdataToModal(row.servingToData+"&"+"servingToData")
+            return(
               <Input type="text"
               value={row.servingToData}
               onChange={onFieldChange(row.id, 'servingToData')}
               focus = {focus}
             />
-            );
+             )
+             
+            
+        
+
         },
         width:12
       },
@@ -318,23 +330,17 @@ export default function ExcelView({data,columnsName}) {
         var wb = XLSX.utils.book_new();
 
         wb.Props = {
-          Title: "SheetJS Tutorial",
+          Title: "Nectar-onboard-Validator",
           Subject: "Test",
           Author: "Manu",
-          CreatedDate: new Date(2017,12,19)
+          CreatedDate: new Date(2021,8,27)
           };
       
           wb.SheetNames.push("sheet1");
-
           var rowData = [].concat(rows)
-
-
           var ws = XLSX.utils.json_to_sheet(rowData.map(({id, ...remainingAttrs}) => remainingAttrs));
-
           wb.Sheets["sheet1"] = ws;
-
           var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
-
             function s2ab(s) { 
               var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
               var view = new Uint8Array(buf);  //create uint8array as viewer
@@ -348,7 +354,7 @@ export default function ExcelView({data,columnsName}) {
       <div style={{ height: '800px' }}>
         <div className="downloadBtn" style={{float:'right',marginTop:'-96px'}}>
         <h3>download excel</h3>
-        <button onClick={handleDownload}>download</button>
+        <Button variant="success" onClick={handleDownload}>download</Button>
         </div>
         <Grid
             columns={initColumns()}
@@ -361,6 +367,34 @@ export default function ExcelView({data,columnsName}) {
             onColumnResize={onColumnResize}
             getRowKey={row => row.id}
         />
+          { show &&
+         <Modal show={show} onHide={handleClose}>
+             <Modal.Header closeButton>
+               <Modal.Title>{dataToModal.split('&')[1]}</Modal.Title>
+             </Modal.Header>
+             <Modal.Body>
+              
+              
+              <FloatingLabel controlId="floatingTextarea2" label="Comments">
+                <Form.Control
+                  as="textarea"
+                  placeholder="Leave a comment here"
+                  style={{ height: '400px' }}
+                  value = {dataToModal.split('&')[0]}
+                />
+              </FloatingLabel>
+               
+               </Modal.Body>
+             <Modal.Footer>
+               <Button variant="secondary" onClick={handleClose}>
+                 Close
+               </Button>
+               <Button variant="primary" onClick={handleClose}>
+                 Save Changes
+               </Button>
+             </Modal.Footer>
+           </Modal>
+          }
         </div>
     )
 }
