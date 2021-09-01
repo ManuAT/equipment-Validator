@@ -85,7 +85,7 @@ function App() {
       />
       </div>
       {/* {data.length>0 ? <ExcelView data={data} columnsName={columnsName}/> : null} */}
-      <EditableTable />
+      {data.length>0 ? <EditableTable data={data} columnsName={columnsName}/> : null}
     </div>
   );
 }
