@@ -1,6 +1,7 @@
 import React,{useState,useRef} from 'react';
 import './App.css';
 import ExcelView from './ExcelView'
+import EditableTable from './EditableTable'
 import * as XLSX from 'xlsx';
 
 function App() {
@@ -83,7 +84,8 @@ function App() {
         onChange={handleFileUpload}
       />
       </div>
-      {data.length>0 ? <ExcelView data={data} columnsName={columnsName}/> : null}
+      {/* {data.length>0 ? <ExcelView data={data} columnsName={columnsName}/> : null} */}
+      <EditableTable />
     </div>
   );
 }
