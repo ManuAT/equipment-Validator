@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { Table, Input, Button, Popconfirm, Form ,Dropdown,Menu,Space} from 'antd';
+import { Table, Input, Button, Popconfirm, Form ,Select,Menu,Space} from 'antd';
 import Highlighter from 'react-highlight-words';
 import { SearchOutlined } from '@ant-design/icons';
 import * as XLSX from 'xlsx';
@@ -54,17 +54,22 @@ const EditableRow = ({ index, ...props }) => {
         console.log('Save failed:', errInfo);
       }
     };
-// temp menu
-    const menu = (
-      <Menu>
-        <Menu.Item key="1">1st menu item</Menu.Item>
-        <Menu.Item key="2">2nd menu item</Menu.Item>
-        <Menu.Item key="3">3rd menu item</Menu.Item>
-      </Menu>
-    );
+    // temp data
+    const somePositions =[{
+          id: 'nectarit',
+          name: 'nectarit'
+      }, {
+          id: 'emaar',
+          name: 'emaar'
+      },
+      {
+        id: 'netix',
+        name: 'netix'
+      }
+    ];
   
     let childNode = children;
-
+    const { Option } = Select;
     if (editable) {
         childNode = editing ? (
           <Form.Item
@@ -79,10 +84,19 @@ const EditableRow = ({ index, ...props }) => {
               },
             ]}
           >
-            <Input ref={inputRef} onPressEnter={save} onBlur={save} />
-            {/* <Dropdown overlay={menu} >
-              <span ref={inputRef} style={{ userSelect: "none" }}>hover on Me</span>
-            </Dropdown> */}
+            {
+
+              title == 'client'?( 
+                <Select ref={inputRef} defaultValue={children[1]} style={{ width: 120 }} onChange={save} onBlur={save} >
+                {somePositions.map((value)=> <Option key={value.id} value={value.id}>{value.name}</Option>)}
+                </Select>
+              
+              ):
+  
+              (<Input ref={inputRef} onPressEnter={save} onBlur={save} /> )
+            }
+
+            
           </Form.Item>
         ) : (
           <div
@@ -92,7 +106,9 @@ const EditableRow = ({ index, ...props }) => {
             }}
             onClick={toggleEdit}
           >
-            {children}
+            {
+            children[1].length>10?children[1].substring(0,10)+"...":children[1]
+            }
           </div>
         );
       }
