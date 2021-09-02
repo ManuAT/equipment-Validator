@@ -5,7 +5,6 @@ import Highlighter from 'react-highlight-words';
 import { SearchOutlined } from '@ant-design/icons';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver'
-import { logDOM } from '@testing-library/react';
 
 const EditableContext = React.createContext(null);
 
@@ -62,14 +61,14 @@ const EditableRow = ({ index, ...props }) => {
       try {
         const values = await form.validateFields();
         toggleEdit();
-        // console.log(record,values);
-        updateDataSourceWithValidation(record,[])
         handleSave({ ...record, ...values });
+        updateDataSourceWithValidation(record,[])
 
       } catch (errInfo) {
         console.log('Save failed:', errInfo);
+        toggleEdit();
+        handleSave({ ...record, ...errInfo.values});
         updateDataSourceWithValidation(record,errInfo.errorFields[0].name)
-        // handleSave({ ...record, ...values });
       }
     };
 
@@ -131,7 +130,7 @@ const EditableRow = ({ index, ...props }) => {
           </Form.Item>
         ) : (
 
-          
+
           
 
          <div
@@ -267,7 +266,7 @@ class EditableTable extends React.Component {
           sorter: (a, b) => a.community.length - b.community.length,
           sortDirections: ['descend', 'ascend'],
           render:(_, record)=>{
-            // console.log({record});
+            console.log({record});
             const isError = record.vaildationStatus?.includes("community");
             return <span style={{color:isError?"red":"black"}}>{record.community}</span>
           }
@@ -425,7 +424,7 @@ class EditableTable extends React.Component {
     updateDataSourceWithValidation = (record,vaildationStatus)=>{
       const dataSource = [...this.state.dataSource];
       this.setState({
-        dataSource: dataSource.map((item) => item.key == record.key? {...item, vaildationStatus}:item),
+        dataSource: dataSource.map((item) => item.key == record.key ? {...item, vaildationStatus}:item),
       });
     }
   
@@ -438,10 +437,23 @@ class EditableTable extends React.Component {
     handleAdd = () => {
       const { count, dataSource } = this.state;
       const newData = {
-        key: count,
-        name: `Edward King ${count}`,
-        age: '32',
-        address: `London, Park Lane no. ${count}`,
+        assetCode: "",
+        client: "",
+        commonAreaData: "",
+        community: "",
+        contractAccountNumber: "",
+        deviceId: "",
+        equipmentName: "",
+        equipmentType: "",
+        floorsData: "",
+        key: uuidv4(),
+        meterNumber: "",
+        pointsData: "",
+        premiseNo: "",
+        roomsData: "",
+        servingByData: "",
+        servingToData: "",
+        siteName: ""
       };
       this.setState({
         dataSource: [...dataSource, newData],
@@ -487,7 +499,7 @@ class EditableTable extends React.Component {
 
     render() {
       const { dataSource } = this.state;
-      console.log(dataSource);
+      // console.log(dataSource);
 
       const components = {
         body: {
