@@ -12,6 +12,17 @@ code {
     monospace;
 } */
 
+/* table */
+.ant-table {
+  font-size: 21px;
+}
+
+/* row data */
+.ant-table-tbody > tr > td {
+  height: 10px;
+  padding: 4px;
+}
+
 
 .editable-cell {
   position: relative;

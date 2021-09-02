@@ -1,7 +1,10 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { Table, Input, Button, Popconfirm, Form ,Dropdown,Menu } from 'antd';
-
+import { Table, Input, Button, Popconfirm, Form ,Dropdown,Menu,Space} from 'antd';
+import Highlighter from 'react-highlight-words';
+import { SearchOutlined } from '@ant-design/icons';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver'
 
 const EditableContext = React.createContext(null);
 
@@ -98,6 +101,94 @@ const EditableRow = ({ index, ...props }) => {
     };
 
 class EditableTable extends React.Component {
+  // handle filter
+  state = {
+    searchText: '',
+    searchedColumn: '',
+  };
+  getColumnSearchProps = dataIndex => ({
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          ref={node => {
+            this.searchInput = node;
+          }}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{ marginBottom: 8, display: 'block' }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Search
+          </Button>
+          <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{ width: 90 }}>
+            Reset
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              confirm({ closeDropdown: false });
+              this.setState({
+                searchText: selectedKeys[0],
+                searchedColumn: dataIndex,
+              });
+            }}
+          >
+            Filter
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+    onFilter: (value, record) =>
+      record[dataIndex]
+        ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
+        : '',
+    onFilterDropdownVisibleChange: visible => {
+      if (visible) {
+        setTimeout(() => this.searchInput.select(), 100);
+      }
+    },
+    render: text =>
+      this.state.searchedColumn === dataIndex ? (
+        <Highlighter
+          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+          searchWords={[this.state.searchText]}
+          autoEscape
+          textToHighlight={text ? text.toString() : ''}
+        />
+       
+      ) : (
+        text
+      ),
+  });
+
+  handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    this.setState({
+      searchText: selectedKeys[0],
+      searchedColumn: dataIndex,
+    });
+  };
+
+  handleReset = clearFilters => {
+    clearFilters();
+    this.setState({ searchText: '' });
+  };
+
+
+// need to fix fillter issue
+
+  // handle table
     constructor(props) {
       super(props);
       this.columns = [
@@ -106,84 +197,129 @@ class EditableTable extends React.Component {
           dataIndex: 'client',
           // width: '30%',
           editable: true,
+          ...this.getColumnSearchProps('client'),
+          sorter: (a, b) => a.client.length - b.client.length,
+          sortDirections: ['descend', 'ascend'],
         },
         {
           title: 'deviceId',
           dataIndex: 'deviceId',
           editable: true,
-          
+          ...this.getColumnSearchProps('deviceId'),
+          sorter: (a, b) => a.deviceId.length - b.deviceId.length,
+          sortDirections: ['descend', 'ascend'],
         },
         {
           title: 'community',
           dataIndex: 'community',
           editable: true,
+          ...this.getColumnSearchProps('community'),
+          sorter: (a, b) => a.community.length - b.community.length,
+          sortDirections: ['descend', 'ascend'],
         },
         {
           title: 'siteName',
           dataIndex: 'siteName',
           editable: true,
+          ...this.getColumnSearchProps('siteName'),
+          sorter: (a, b) => a.siteName.length - b.siteName.length,
+          sortDirections: ['descend', 'ascend'],
         },
         {
           title: 'equipmentName',
           dataIndex: 'equipmentName',
           editable: true,
+          ...this.getColumnSearchProps('equipmentName'),
+          sorter: (a, b) => a.equipmentName.length - b.equipmentName.length,
+          sortDirections: ['descend', 'ascend'],
         },
         {
           title: 'equipmentType',
           dataIndex: 'equipmentType',
           editable: true,
+          ...this.getColumnSearchProps('equipmentType'),
+          sorter: (a, b) => a.equipmentType.length - b.equipmentType.length,
+          sortDirections: ['descend', 'ascend'],
         },
         {
           title: 'assetCode',
           dataIndex: 'assetCode',
           editable: true,
+          ...this.getColumnSearchProps('assetCode'),
+          sorter: (a, b) => a.assetCode.length - b.assetCode.length,
+          sortDirections: ['descend', 'ascend'],
         },
         {
           title: 'pointsData',
           dataIndex: 'pointsData',
           editable: true,
+          ...this.getColumnSearchProps('pointsData'),
+          sorter: (a, b) => a.pointsData.length - b.pointsData.length,
+          sortDirections: ['descend', 'ascend'],
         },
         {
           title: 'roomsData',
           dataIndex: 'roomsData',
           editable: true,
+          ...this.getColumnSearchProps('roomsData'),
+          sorter: (a, b) => a.roomsData.length - b.roomsData.length,
+          sortDirections: ['descend', 'ascend'],
         },
         {
           title: 'floorsData',
           dataIndex: 'floorsData',
           editable: true,
+          ...this.getColumnSearchProps('floorsData'),
+          sorter: (a, b) => a.floorsData.length - b.floorsData.length,
+          sortDirections: ['descend', 'ascend'],
         },
         {
           title: 'commonAreaData',
           dataIndex: 'commonAreaData',
           editable: true,
+          ...this.getColumnSearchProps('commonAreaData'),
+          sorter: (a, b) => a.commonAreaData.length - b.commonAreaData.length,
+          sortDirections: ['descend', 'ascend'],
         },
         {
           title: 'servingToData',
           dataIndex: 'servingToData',
           editable: true,
-          width:'40%'
+          width:'40%',
+          sorter: (a, b) => a.servingToData.length - b.servingToData.length,
+          sortDirections: ['descend', 'ascend'],
         },
         {
           title: 'servingByData',
           dataIndex: 'servingByData',
           editable: true,
-          width:'40%'
+          width:'40%',
+          ...this.getColumnSearchProps('servingByData'),
+          sorter: (a, b) => a.servingByData.length - b.servingByData.length,
+          sortDirections: ['descend', 'ascend'],
         },
         {
           title: 'contractAccountNumber',
           dataIndex: 'contractAccountNumber',
           editable: true,
+          ...this.getColumnSearchProps('contractAccountNumber'),
+          sorter: (a, b) => a.contractAccountNumber.length - b.contractAccountNumber.length,
+          sortDirections: ['descend', 'ascend'],
         },
         {
           title: 'premiseNo',
           dataIndex: 'premiseNo',
           editable: true,
+          ...this.getColumnSearchProps('premiseNo'),
+          sorter: (a, b) => a.premiseNo.length - b.premiseNo.length,
+          sortDirections: ['descend', 'ascend'],
         },
         {
           title: 'meterNumber',
           dataIndex: 'meterNumber',
-          editable: true,
+          editable: true, ...this.getColumnSearchProps('meterNumber'),
+          sorter: (a, b) => a.meterNumber.length - b.meterNumber.length,
+          sortDirections: ['descend', 'ascend'],
         },
         {
           title: 'operation',
@@ -214,7 +350,7 @@ class EditableTable extends React.Component {
         //   // },
         //   { key: uuidv4(), client: 'nectar', deviceId: 'Win-3470-EF83-AAC7-0016', community:"downtown" ,siteName:'OTCI Attareen',equipmentName:'ATREN 1F FCU Lift Lobby Core A',equipmentType:'FanCoilUnit',assetCode:'0187902',pointsData:'Run Status@BMS Schedule Enable@Manual Occupancy@Return Temperature@Space Humidity@Valve Position@Supervisory Fan Speed@Fan Operation Command@Return Temperature Setpoint@Unoccupied Setpoint'}
         // ],
-        count: 1,
+        count: this.props.data.length,
       };
     }
   
@@ -246,7 +382,34 @@ class EditableTable extends React.Component {
         dataSource: newData,
       });
     };
-  
+    
+
+    // download excel
+     handleDownload = e =>{
+ 
+      var wb = XLSX.utils.book_new();
+
+      wb.Props = {
+        Title: "Nectar-onboard-Validator",
+        Subject: "Test",
+        Author: "Manu",
+        CreatedDate: new Date(2021,8,27)
+        };
+    
+        wb.SheetNames.push("sheet1");
+        var rowData = [].concat(this.state.dataSource)
+        var ws = XLSX.utils.json_to_sheet(rowData.map(({key, ...remainingAttrs}) => remainingAttrs));
+        wb.Sheets["sheet1"] = ws;
+        var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
+          function s2ab(s) { 
+            var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+            var view = new Uint8Array(buf);  //create uint8array as viewer
+            for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+            return buf;    
+          }
+          saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'test.xlsx');
+}
+
     render() {
       const { dataSource } = this.state;
       const components = {
@@ -281,6 +444,14 @@ class EditableTable extends React.Component {
             }}
           >
             Add a row
+          </Button> <Button
+            onClick={this.handleDownload}
+            type="primary"
+            style={{
+              marginBottom: 16,
+            }}
+          >
+            Download
           </Button>
           <Table
             components={components}
