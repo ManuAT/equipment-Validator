@@ -74,21 +74,24 @@ function App() {
   }
 
   return (
-    <div>
+    <>
+    <div className="mainBody" style={{padding:'22px 12px 22px 11px'}}>
       <div className="tittle" style={{position:'absolute',marginLeft:'40%'}}>
         <h2>Nectar Oboarding Validator</h2>
       </div>
-      <div className="uploadBtn" style={{marginTop:'20px',marginBottom:'12px'}}>
-      <h3>Upload csv/excel</h3>
+      {data.length ==0 ? <div className="uploadBtn" style={{marginTop:'20px',marginBottom:'12px'}}>
+      <h5>Upload csv/excel</h5>
       <input
         type="file"
         accept=".csv,.xlsx,.xls"
         onChange={handleFileUpload}
       />
-      </div>
+      </div> : null}
       {/* {data.length>0 ? <ExcelView data={data} columnsName={columnsName}/> : null} */}
       {data.length>0 ? <EditableTable data={data} columnsName={columnsName}/> : null}
     </div>
+    
+    </>
   );
 }
 

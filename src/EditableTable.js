@@ -5,8 +5,19 @@ import Highlighter from 'react-highlight-words';
 import { SearchOutlined } from '@ant-design/icons';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver'
+import { logDOM } from '@testing-library/react';
 
 const EditableContext = React.createContext(null);
+
+function validator(columnName){
+  switch(columnName){
+    case 'community': return new RegExp("^[A-Za-z]+$")
+    break
+    default: return new RegExp(/^.*$/)
+
+  }
+}
+
 
 
 const EditableRow = ({ index, ...props }) => {
@@ -27,8 +38,10 @@ const EditableRow = ({ index, ...props }) => {
     dataIndex,
     record,
     handleSave,
+    updateDataSourceWithValidation,
     ...restProps
   }) => {
+    // console.log(children[1]);
     const [editing, setEditing] = useState(false);
     const inputRef = useRef(null);
     const form = useContext(EditableContext);
@@ -49,9 +62,22 @@ const EditableRow = ({ index, ...props }) => {
       try {
         const values = await form.validateFields();
         toggleEdit();
+        // console.log(record,values);
+        updateDataSourceWithValidation(record,[])
         handleSave({ ...record, ...values });
+
       } catch (errInfo) {
         console.log('Save failed:', errInfo);
+        updateDataSourceWithValidation(record,errInfo.errorFields[0].name)
+        // handleSave({ ...record, ...values });
+      }
+    };
+
+    const handeleValidate = async () => {
+      try {
+        const values = await form.validateFields();
+      } catch (errInfo) {
+        // console.log('validation errors:', errInfo);
       }
     };
     // temp data
@@ -70,46 +96,52 @@ const EditableRow = ({ index, ...props }) => {
   
     let childNode = children;
     const { Option } = Select;
+    const { TextArea } = Input;
     if (editable) {
         childNode = editing ? (
           <Form.Item
             style={{
               margin: 0,
             }}
+
             name={dataIndex}
+
             rules={[
               {
                 required: true,
+                pattern: validator(title),
                 message: `${title} is required.`,
               },
             ]}
+
           >
             {
 
               title == 'client'?( 
-                <Select ref={inputRef} defaultValue={children[1]} style={{ width: 120 }} onChange={save} onBlur={save} >
+                <Select ref={inputRef} defaultValue={children[1]} style={{ width: 100 }} onChange={save} onBlur={save} >
                 {somePositions.map((value)=> <Option key={value.id} value={value.id}>{value.name}</Option>)}
                 </Select>
               
               ):
-  
-              (<Input ref={inputRef} onPressEnter={save} onBlur={save} /> )
+                
+              (<TextArea style={{ width: '370px' }}  ref={inputRef} onPressEnter={save} onFocus={handeleValidate} onBlur={save} autoSize /> )
             }
 
             
           </Form.Item>
         ) : (
-          <div
+
+          
+          
+
+         <div
             className="editable-cell-value-wrap"
-            style={{
-              paddingRight: 24,
-            }}
             onClick={toggleEdit}
-          >
-            {
-            children[1].length>10?children[1].substring(0,10)+"...":children[1]
-            }
-          </div>
+            >
+              {children}
+          </div> 
+
+
         );
       }
     
@@ -211,7 +243,7 @@ class EditableTable extends React.Component {
         {
           title: 'client',
           dataIndex: 'client',
-          // width: '30%',
+          width: 140,
           editable: true,
           ...this.getColumnSearchProps('client'),
           sorter: (a, b) => a.client.length - b.client.length,
@@ -220,6 +252,7 @@ class EditableTable extends React.Component {
         {
           title: 'deviceId',
           dataIndex: 'deviceId',
+          width: 250,
           editable: true,
           ...this.getColumnSearchProps('deviceId'),
           sorter: (a, b) => a.deviceId.length - b.deviceId.length,
@@ -228,14 +261,21 @@ class EditableTable extends React.Component {
         {
           title: 'community',
           dataIndex: 'community',
+          width: 150,
           editable: true,
           ...this.getColumnSearchProps('community'),
           sorter: (a, b) => a.community.length - b.community.length,
           sortDirections: ['descend', 'ascend'],
+          render:(_, record)=>{
+            // console.log({record});
+            const isError = record.vaildationStatus?.includes("community");
+            return <span style={{color:isError?"red":"black"}}>{record.community}</span>
+          }
         },
         {
           title: 'siteName',
           dataIndex: 'siteName',
+          width: 150,
           editable: true,
           ...this.getColumnSearchProps('siteName'),
           sorter: (a, b) => a.siteName.length - b.siteName.length,
@@ -245,6 +285,7 @@ class EditableTable extends React.Component {
           title: 'equipmentName',
           dataIndex: 'equipmentName',
           editable: true,
+          width: 280,
           ...this.getColumnSearchProps('equipmentName'),
           sorter: (a, b) => a.equipmentName.length - b.equipmentName.length,
           sortDirections: ['descend', 'ascend'],
@@ -252,6 +293,7 @@ class EditableTable extends React.Component {
         {
           title: 'equipmentType',
           dataIndex: 'equipmentType',
+          width: 200,
           editable: true,
           ...this.getColumnSearchProps('equipmentType'),
           sorter: (a, b) => a.equipmentType.length - b.equipmentType.length,
@@ -260,6 +302,7 @@ class EditableTable extends React.Component {
         {
           title: 'assetCode',
           dataIndex: 'assetCode',
+          width: 100,
           editable: true,
           ...this.getColumnSearchProps('assetCode'),
           sorter: (a, b) => a.assetCode.length - b.assetCode.length,
@@ -268,6 +311,7 @@ class EditableTable extends React.Component {
         {
           title: 'pointsData',
           dataIndex: 'pointsData',
+          width: 280,
           editable: true,
           ...this.getColumnSearchProps('pointsData'),
           sorter: (a, b) => a.pointsData.length - b.pointsData.length,
@@ -276,6 +320,7 @@ class EditableTable extends React.Component {
         {
           title: 'roomsData',
           dataIndex: 'roomsData',
+          width: 280,
           editable: true,
           ...this.getColumnSearchProps('roomsData'),
           sorter: (a, b) => a.roomsData.length - b.roomsData.length,
@@ -284,6 +329,7 @@ class EditableTable extends React.Component {
         {
           title: 'floorsData',
           dataIndex: 'floorsData',
+          width: 250,
           editable: true,
           ...this.getColumnSearchProps('floorsData'),
           sorter: (a, b) => a.floorsData.length - b.floorsData.length,
@@ -292,6 +338,7 @@ class EditableTable extends React.Component {
         {
           title: 'commonAreaData',
           dataIndex: 'commonAreaData',
+          width: 250,
           editable: true,
           ...this.getColumnSearchProps('commonAreaData'),
           sorter: (a, b) => a.commonAreaData.length - b.commonAreaData.length,
@@ -300,16 +347,16 @@ class EditableTable extends React.Component {
         {
           title: 'servingToData',
           dataIndex: 'servingToData',
+          width: 400,
           editable: true,
-          width:'40%',
           sorter: (a, b) => a.servingToData.length - b.servingToData.length,
           sortDirections: ['descend', 'ascend'],
-        },
+        },  
         {
           title: 'servingByData',
           dataIndex: 'servingByData',
+          width: 400,
           editable: true,
-          width:'40%',
           ...this.getColumnSearchProps('servingByData'),
           sorter: (a, b) => a.servingByData.length - b.servingByData.length,
           sortDirections: ['descend', 'ascend'],
@@ -317,6 +364,7 @@ class EditableTable extends React.Component {
         {
           title: 'contractAccountNumber',
           dataIndex: 'contractAccountNumber',
+          width: 210,
           editable: true,
           ...this.getColumnSearchProps('contractAccountNumber'),
           sorter: (a, b) => a.contractAccountNumber.length - b.contractAccountNumber.length,
@@ -325,6 +373,7 @@ class EditableTable extends React.Component {
         {
           title: 'premiseNo',
           dataIndex: 'premiseNo',
+          width: 150,
           editable: true,
           ...this.getColumnSearchProps('premiseNo'),
           sorter: (a, b) => a.premiseNo.length - b.premiseNo.length,
@@ -333,6 +382,7 @@ class EditableTable extends React.Component {
         {
           title: 'meterNumber',
           dataIndex: 'meterNumber',
+          width: 150,
           editable: true, ...this.getColumnSearchProps('meterNumber'),
           sorter: (a, b) => a.meterNumber.length - b.meterNumber.length,
           sortDirections: ['descend', 'ascend'],
@@ -340,6 +390,8 @@ class EditableTable extends React.Component {
         {
           title: 'operation',
           dataIndex: 'operation',
+          width: 100,
+          fixed: 'right',
           render: (_, record) =>
             this.state.dataSource.length >= 1 ? (
               <Popconfirm title="Sure to delete?" onConfirm={() => this.handleDelete(record.key)}>
@@ -351,7 +403,7 @@ class EditableTable extends React.Component {
       this.state = {
         dataSource:this.props.data.map(obj=> ({ ...obj, key: uuidv4() })),
 
-        // [
+         // [
         //   // {
         //   //   key: '0',
         //   //   name: 'Edward King 0',
@@ -368,6 +420,13 @@ class EditableTable extends React.Component {
         // ],
         count: this.props.data.length,
       };
+    }
+
+    updateDataSourceWithValidation = (record,vaildationStatus)=>{
+      const dataSource = [...this.state.dataSource];
+      this.setState({
+        dataSource: dataSource.map((item) => item.key == record.key? {...item, vaildationStatus}:item),
+      });
     }
   
     handleDelete = (key) => {
@@ -428,6 +487,8 @@ class EditableTable extends React.Component {
 
     render() {
       const { dataSource } = this.state;
+      console.log(dataSource);
+
       const components = {
         body: {
           row: EditableRow,
@@ -447,11 +508,12 @@ class EditableTable extends React.Component {
             dataIndex: col.dataIndex,
             title: col.title,
             handleSave: this.handleSave,
+            updateDataSourceWithValidation : this.updateDataSourceWithValidation
           }),
         };
       });
       return (
-        <div>
+        <div style={{paddingTop:'50px'}}>
           <Button
             onClick={this.handleAdd}
             type="primary"
@@ -475,6 +537,7 @@ class EditableTable extends React.Component {
             bordered
             dataSource={dataSource}
             columns={columns}
+            scroll={{x: 1800, y: 700 }}
           />
         </div>
       );
