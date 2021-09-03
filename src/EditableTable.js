@@ -10,8 +10,10 @@ const EditableContext = React.createContext(null);
 
 function validator(columnName){
   switch(columnName){
+    case 'client': return new RegExp("^[A-Za-z]+$")
     case 'community': return new RegExp("^[A-Za-z]+$")
-    break
+    case 'community': return new RegExp("^[A-Za-z]+$")
+    
     default: return new RegExp(/^.*$/)
 
   }
@@ -38,6 +40,7 @@ const EditableRow = ({ index, ...props }) => {
     record,
     handleSave,
     updateDataSourceWithValidation,
+    selectDropDownValues,
     ...restProps
   }) => {
     // console.log(children[1]);
@@ -59,16 +62,18 @@ const EditableRow = ({ index, ...props }) => {
   
     const save = async () => {
       try {
+        var validArray = []
         const values = await form.validateFields();
         toggleEdit();
+        // console.log(Object.keys(values))
         handleSave({ ...record, ...values });
-        updateDataSourceWithValidation(record,[])
+        updateDataSourceWithValidation(record,Object.keys(values),false)
 
       } catch (errInfo) {
-        console.log('Save failed:', errInfo);
+        // console.log('Save failed:', errInfo);
         toggleEdit();
         handleSave({ ...record, ...errInfo.values});
-        updateDataSourceWithValidation(record,errInfo.errorFields[0].name)
+        updateDataSourceWithValidation(record,errInfo.errorFields[0].name,true)
       }
     };
 
@@ -80,18 +85,7 @@ const EditableRow = ({ index, ...props }) => {
       }
     };
     // temp data
-    const somePositions =[{
-          id: 'nectarit',
-          name: 'nectarit'
-      }, {
-          id: 'emaar',
-          name: 'emaar'
-      },
-      {
-        id: 'netix',
-        name: 'netix'
-      }
-    ];
+    
   
     let childNode = children;
     const { Option } = Select;
@@ -118,7 +112,7 @@ const EditableRow = ({ index, ...props }) => {
 
               title == 'client'?( 
                 <Select ref={inputRef} defaultValue={children[1]} style={{ width: 100 }} onChange={save} onBlur={save} >
-                {somePositions.map((value)=> <Option key={value.id} value={value.id}>{value.name}</Option>)}
+                {selectDropDownValues.map((value)=> <Option key={value.id} value={value.id}>{value.name}</Option>)}
                 </Select>
               
               ):
@@ -137,7 +131,8 @@ const EditableRow = ({ index, ...props }) => {
             className="editable-cell-value-wrap"
             onClick={toggleEdit}
             >
-              {children}
+              {/* {typeof children[1] != "string"? 'noo' : children[1].length>25?children[1].substring(0,25)+"...":children[1]} */}
+              {children[1].length>25?children[1].substring(0,25)+"...":children[1]}
           </div> 
 
 
@@ -247,6 +242,11 @@ class EditableTable extends React.Component {
           ...this.getColumnSearchProps('client'),
           sorter: (a, b) => a.client.length - b.client.length,
           sortDirections: ['descend', 'ascend'],
+          render:(_, record)=>{
+            // console.log({record}); this.selectDropDownValues.name?.includes(record.client)
+            const isError = record.vaildationStatus?.includes("client") || this.selectDropDownValues.find(value => value.name == record.client)==undefined;
+            return <span style={{color:isError?"red":"black"}}>{record.client}</span>
+          }
         },
         {
           title: 'deviceId',
@@ -266,7 +266,7 @@ class EditableTable extends React.Component {
           sorter: (a, b) => a.community.length - b.community.length,
           sortDirections: ['descend', 'ascend'],
           render:(_, record)=>{
-            console.log({record});
+            // console.log({record});
             const isError = record.vaildationStatus?.includes("community");
             return <span style={{color:isError?"red":"black"}}>{record.community}</span>
           }
@@ -399,8 +399,12 @@ class EditableTable extends React.Component {
             ) : null,
         },
       ];
+
+      // addind validation to inputing data
+      var dataInputFromFile = this.props.data.map(obj=> ({ ...obj, key: uuidv4() }))
+      dataInputFromFile = [...dataInputFromFile].map(obj => ({...obj,vaildationStatus:this.intialValidation(obj)}))
       this.state = {
-        dataSource:this.props.data.map(obj=> ({ ...obj, key: uuidv4() })),
+        dataSource:dataInputFromFile,
 
          // [
         //   // {
@@ -421,11 +425,44 @@ class EditableTable extends React.Component {
       };
     }
 
-    updateDataSourceWithValidation = (record,vaildationStatus)=>{
+     selectDropDownValues =[{
+      id: 'nectarit',
+      name: 'nectarit'
+      }, {
+          id: 'emaar',
+          name: 'emaar'
+      },
+      {
+        id: 'netix',
+        name: 'netix'
+      }
+    ];
+
+    intialValidation = (record)=>{
+      let validationArray = []
+      for (let [key, value] of Object.entries(record)) {
+       if( validator(key).exec(value) == null)
+          validationArray.push(key)
+    }
+      return validationArray
+    }
+
+    updateDataSourceWithValidation = (record,validationArray,action)=>{
+
+
       const dataSource = [...this.state.dataSource];
       this.setState({
-        dataSource: dataSource.map((item) => item.key == record.key ? {...item, vaildationStatus}:item),
+        dataSource: dataSource.map((item) => {        
+        var temp = Object.assign({}, item);
+        if (temp.key == record.key) {
+          action? temp.vaildationStatus.concat(validationArray): temp.vaildationStatus = temp.vaildationStatus.filter( ( el ) => !validationArray.includes( el ) )
+        }
+        return temp;
+      })
+
       });
+
+      console.log("data",[...this.state.dataSource])
     }
   
     handleDelete = (key) => {
@@ -453,7 +490,8 @@ class EditableTable extends React.Component {
         roomsData: "",
         servingByData: "",
         servingToData: "",
-        siteName: ""
+        siteName: "",
+        vaildationStatus:[]
       };
       this.setState({
         dataSource: [...dataSource, newData],
@@ -520,7 +558,8 @@ class EditableTable extends React.Component {
             dataIndex: col.dataIndex,
             title: col.title,
             handleSave: this.handleSave,
-            updateDataSourceWithValidation : this.updateDataSourceWithValidation
+            updateDataSourceWithValidation : this.updateDataSourceWithValidation,
+            selectDropDownValues : this.selectDropDownValues
           }),
         };
       });
