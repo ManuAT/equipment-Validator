@@ -10,7 +10,8 @@ const EditableContext = React.createContext(null);
 
 function validator(columnName){
   switch(columnName){
-    case 'client': return new RegExp("^[A-Za-z]+$")
+    case 'client': return new RegExp("^[A-Za-z]+$") //netix
+    case 'deviceId': return new RegExp("^[A-Za-z]+$") //Win-3470-EF83-AAC7-0016
     case 'community': return new RegExp("^[A-Za-z]+$")
     case 'community': return new RegExp("^[A-Za-z]+$")
     
@@ -70,7 +71,7 @@ const EditableRow = ({ index, ...props }) => {
         updateDataSourceWithValidation(record,Object.keys(values),false)
 
       } catch (errInfo) {
-        // console.log('Save failed:', errInfo);
+        console.log('Save failed:', errInfo);
         toggleEdit();
         handleSave({ ...record, ...errInfo.values});
         updateDataSourceWithValidation(record,errInfo.errorFields[0].name,true)
@@ -455,7 +456,7 @@ class EditableTable extends React.Component {
         dataSource: dataSource.map((item) => {        
         var temp = Object.assign({}, item);
         if (temp.key == record.key) {
-          action? temp.vaildationStatus.concat(validationArray): temp.vaildationStatus = temp.vaildationStatus.filter( ( el ) => !validationArray.includes( el ) )
+          action? temp.vaildationStatus = [...temp.vaildationStatus].concat(validationArray) : temp.vaildationStatus = temp.vaildationStatus.filter( ( el ) => !validationArray.includes( el ) )
         }
         return temp;
       })
