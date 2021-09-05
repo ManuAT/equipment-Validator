@@ -1,10 +1,11 @@
 import React,{useState,useRef} from 'react';
 import './App.css';
 // import ExcelView from './ExcelView'
-// import {Button,Input} from 'antd';
+import {Button,Input} from 'antd';
 
 import EditableTable from './EditableTable'
 import * as XLSX from 'xlsx';
+import { logDOM } from '@testing-library/dom';
 
 function App() {
   
@@ -73,22 +74,38 @@ function App() {
     reader.readAsBinaryString(file);
   }
 
+  // check for local Storage
+  const handelLocalStorage =()=>{
+      const validatorData = localStorage.getItem('validatorData');
+      setData(JSON.parse(validatorData))
+  }
+
+
   return (
     <>
     <div className="mainBody" style={{padding:'22px 12px 22px 11px'}}>
       <div className="tittle" style={{position:'absolute',marginLeft:'40%'}}>
         <h2>Nectar Oboarding Validator</h2>
       </div>
-      {data.length ==0 ? <div className="uploadBtn" style={{marginTop:'20px',marginBottom:'12px'}}>
+      {data.length == 0 ? <div className="uploadBtn" style={{marginTop:'20px',marginBottom:'12px'}}>
       <h5>Upload csv/excel</h5>
       <input
         type="file"
         accept=".csv,.xlsx,.xls"
         onChange={handleFileUpload}
       />
+      {
+      localStorage.getItem('validatorData') != null ?
+      <Button
+            onClick={handelLocalStorage}
+            type="primary"
+            style={{
+              marginBottom: 16,
+            }}
+        >Continue with Save</Button> : null }
       </div> : null}
       {/* {data.length>0 ? <ExcelView data={data} columnsName={columnsName}/> : null} */}
-      {data.length>0 ? <EditableTable data={data} columnsName={columnsName}/> : null}
+      {data.length>0 ? <EditableTable data={data} /> : null}
     </div>
     
     </>

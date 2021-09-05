@@ -10,10 +10,14 @@ const EditableContext = React.createContext(null);
 
 function validator(columnName){
   switch(columnName){
-    case 'client': return new RegExp("^[A-Za-z]+$") //netix
-    case 'deviceId': return new RegExp("^[A-Za-z]+$") //Win-3470-EF83-AAC7-0016
-    case 'community': return new RegExp("^[A-Za-z]+$")
-    case 'community': return new RegExp("^[A-Za-z]+$")
+    case 'client': return new RegExp(/^[a-z]+$/) //netix
+    case 'deviceId': return new RegExp(/^[A-Za-z]{3}\-[A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4}$/) //Win-3470-EF83-AAC7-0016
+    case 'community': return new RegExp(/^[a-z]+$/)//downtown
+    case 'siteName': return new RegExp(/^[A-Z]{3,} [A-Z][a-z]+( [0-9]{2,})*$/)
+    case 'equipmentName': return new RegExp(/^[A-Z]{3,} [A-Z0-9]{2} [A-Z]{3,} [A-Z][a-z]{2,} [A-Z][a-z]{2,} [A-Z][a-z]{2,} [A-Z]$/)
+    case 'equipmentType': return new RegExp(/^[a-zA-Z]+$/)
+    case 'assetCode': return new RegExp(/^[0-9]{7}$/)
+   
     
     default: return new RegExp(/^.*$/)
 
@@ -134,6 +138,7 @@ const EditableRow = ({ index, ...props }) => {
             >
               {/* {typeof children[1] != "string"? 'noo' : children[1].length>25?children[1].substring(0,25)+"...":children[1]} */}
               {children[1].length>25?children[1].substring(0,25)+"...":children[1]}
+              {/* {children} */}
           </div> 
 
 
@@ -257,6 +262,10 @@ class EditableTable extends React.Component {
           ...this.getColumnSearchProps('deviceId'),
           sorter: (a, b) => a.deviceId.length - b.deviceId.length,
           sortDirections: ['descend', 'ascend'],
+          render:(_, record)=>{
+            const isError = record.vaildationStatus?.includes("deviceId");
+            return <span style={{color:isError?"red":"black"}}>{record.deviceId}</span>
+          }
         },
         {
           title: 'community',
@@ -267,7 +276,6 @@ class EditableTable extends React.Component {
           sorter: (a, b) => a.community.length - b.community.length,
           sortDirections: ['descend', 'ascend'],
           render:(_, record)=>{
-            // console.log({record});
             const isError = record.vaildationStatus?.includes("community");
             return <span style={{color:isError?"red":"black"}}>{record.community}</span>
           }
@@ -280,6 +288,10 @@ class EditableTable extends React.Component {
           ...this.getColumnSearchProps('siteName'),
           sorter: (a, b) => a.siteName.length - b.siteName.length,
           sortDirections: ['descend', 'ascend'],
+          render:(_, record)=>{
+            const isError = record.vaildationStatus?.includes("siteName");
+            return <span style={{color:isError?"red":"black"}}>{record.siteName}</span>
+          }
         },
         {
           title: 'equipmentName',
@@ -289,6 +301,10 @@ class EditableTable extends React.Component {
           ...this.getColumnSearchProps('equipmentName'),
           sorter: (a, b) => a.equipmentName.length - b.equipmentName.length,
           sortDirections: ['descend', 'ascend'],
+          render:(_, record)=>{
+            const isError = record.vaildationStatus?.includes("equipmentName");
+            return <span style={{color:isError?"red":"black"}}>{record.equipmentName}</span>
+          }
         },
         {
           title: 'equipmentType',
@@ -298,6 +314,10 @@ class EditableTable extends React.Component {
           ...this.getColumnSearchProps('equipmentType'),
           sorter: (a, b) => a.equipmentType.length - b.equipmentType.length,
           sortDirections: ['descend', 'ascend'],
+          render:(_, record)=>{
+            const isError = record.vaildationStatus?.includes("equipmentType");
+            return <span style={{color:isError?"red":"black"}}>{record.equipmentType}</span>
+          }
         },
         {
           title: 'assetCode',
@@ -307,6 +327,10 @@ class EditableTable extends React.Component {
           ...this.getColumnSearchProps('assetCode'),
           sorter: (a, b) => a.assetCode.length - b.assetCode.length,
           sortDirections: ['descend', 'ascend'],
+          render:(_, record)=>{
+            const isError = record.vaildationStatus?.includes("assetCode");
+            return <span style={{color:isError?"red":"black"}}>{record.assetCode}</span>
+          }
         },
         {
           title: 'pointsData',
@@ -316,6 +340,10 @@ class EditableTable extends React.Component {
           ...this.getColumnSearchProps('pointsData'),
           sorter: (a, b) => a.pointsData.length - b.pointsData.length,
           sortDirections: ['descend', 'ascend'],
+          // render:(_, record)=>{
+          //   const isError = record.vaildationStatus?.includes("pointsData");
+          //   return <span style={{color:isError?"red":"black"}}>{record.pointsData}</span>
+          // }
         },
         {
           title: 'roomsData',
@@ -325,6 +353,10 @@ class EditableTable extends React.Component {
           ...this.getColumnSearchProps('roomsData'),
           sorter: (a, b) => a.roomsData.length - b.roomsData.length,
           sortDirections: ['descend', 'ascend'],
+          // render:(_, record)=>{
+          //   const isError = record.vaildationStatus?.includes("roomsData");
+          //   return <span style={{color:isError?"red":"black"}}>{record.roomsData}</span>
+          // }
         },
         {
           title: 'floorsData',
@@ -334,6 +366,10 @@ class EditableTable extends React.Component {
           ...this.getColumnSearchProps('floorsData'),
           sorter: (a, b) => a.floorsData.length - b.floorsData.length,
           sortDirections: ['descend', 'ascend'],
+          // render:(_, record)=>{
+          //   const isError = record.vaildationStatus?.includes("floorsData");
+          //   return <span style={{color:isError?"red":"black"}}>{record.floorsData}</span>
+          // }
         },
         {
           title: 'commonAreaData',
@@ -343,6 +379,10 @@ class EditableTable extends React.Component {
           ...this.getColumnSearchProps('commonAreaData'),
           sorter: (a, b) => a.commonAreaData.length - b.commonAreaData.length,
           sortDirections: ['descend', 'ascend'],
+          // render:(_, record)=>{
+          //   const isError = record.vaildationStatus?.includes("commonAreaData");
+          //   return <span style={{color:isError?"red":"black"}}>{record.commonAreaData}</span>
+          // }
         },
         {
           title: 'servingToData',
@@ -351,6 +391,10 @@ class EditableTable extends React.Component {
           editable: true,
           sorter: (a, b) => a.servingToData.length - b.servingToData.length,
           sortDirections: ['descend', 'ascend'],
+          // render:(_, record)=>{
+          //   const isError = record.vaildationStatus?.includes("servingToData");
+          //   return <span style={{color:isError?"red":"black"}}>{record.servingToData}</span>
+          // }
         },  
         {
           title: 'servingByData',
@@ -360,6 +404,10 @@ class EditableTable extends React.Component {
           ...this.getColumnSearchProps('servingByData'),
           sorter: (a, b) => a.servingByData.length - b.servingByData.length,
           sortDirections: ['descend', 'ascend'],
+          // render:(_, record)=>{
+          //   const isError = record.vaildationStatus?.includes("servingByData");
+          //   return <span style={{color:isError?"red":"black"}}>{record.servingByData}</span>
+          // }
         },
         {
           title: 'contractAccountNumber',
@@ -369,6 +417,10 @@ class EditableTable extends React.Component {
           ...this.getColumnSearchProps('contractAccountNumber'),
           sorter: (a, b) => a.contractAccountNumber.length - b.contractAccountNumber.length,
           sortDirections: ['descend', 'ascend'],
+          render:(_, record)=>{
+            const isError = record.vaildationStatus?.includes("contractAccountNumber");
+            return <span style={{color:isError?"red":"black"}}>{record.contractAccountNumber}</span>
+          }
         },
         {
           title: 'premiseNo',
@@ -378,6 +430,10 @@ class EditableTable extends React.Component {
           ...this.getColumnSearchProps('premiseNo'),
           sorter: (a, b) => a.premiseNo.length - b.premiseNo.length,
           sortDirections: ['descend', 'ascend'],
+          render:(_, record)=>{
+            const isError = record.vaildationStatus?.includes("premiseNo");
+            return <span style={{color:isError?"red":"black"}}>{record.premiseNo}</span>
+          }
         },
         {
           title: 'meterNumber',
@@ -386,6 +442,10 @@ class EditableTable extends React.Component {
           editable: true, ...this.getColumnSearchProps('meterNumber'),
           sorter: (a, b) => a.meterNumber.length - b.meterNumber.length,
           sortDirections: ['descend', 'ascend'],
+          render:(_, record)=>{
+            const isError = record.vaildationStatus?.includes("meterNumber");
+            return <span style={{color:isError?"red":"black"}}>{record.meterNumber}</span>
+          }
         },
         {
           title: 'operation',
@@ -504,8 +564,9 @@ class EditableTable extends React.Component {
       const index = newData.findIndex((item) => row.key === item.key);
       const item = newData[index];
       newData.splice(index, 1, { ...item, ...row });
+      localStorage.setItem('validatorData',JSON.stringify(newData));
       this.setState({
-        dataSource: newData,
+        dataSource: newData, 
       });
     };
     
