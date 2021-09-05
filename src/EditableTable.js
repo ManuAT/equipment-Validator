@@ -6,6 +6,7 @@ import { SearchOutlined } from '@ant-design/icons';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver'
 
+import './EditableTable.css'
 const EditableContext = React.createContext(null);
 
 function validator(columnName){
@@ -626,7 +627,7 @@ class EditableTable extends React.Component {
         };
       });
       return (
-        <div style={{paddingTop:'50px'}}>
+        <div style={{zIndex:"999",position:"absolute",marginTop:"115px",padding:"6px",width:"100%"}}>
           <Button
             onClick={this.handleAdd}
             type="primary"
@@ -650,7 +651,7 @@ class EditableTable extends React.Component {
             bordered
             dataSource={dataSource}
             columns={columns}
-            scroll={{x: 1800, y: 700 }}
+            scroll={{x: 1800, y: 550 }}
           />
         </div>
       );

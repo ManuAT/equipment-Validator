@@ -1,0 +1,10 @@
+.ant-table .ant-table-thead>tr>th {
+  background: #88a0e7;
+  color: #0b132b;
+  font-size: 14px;
+  /* text-transform: uppercase; */
+}
+
+.ant-table-filter-trigger{
+  /* color: red !important; */
+}

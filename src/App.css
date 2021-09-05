@@ -36,3 +36,22 @@
     transform: rotate(360deg);
   }
 }
+
+.headerClass {
+  background: #0b132b;
+  padding: 10px 20px;
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  right: 0;
+}
+
+.header_title__10x6m {
+  font-weight: 300;
+  font-size: 22px;
+  color: #f1f1f1;
+}
+
+.ant-card-head{
+  background: #83c5be;
+}

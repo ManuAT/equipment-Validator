@@ -1,7 +1,7 @@
 import React,{useState,useRef} from 'react';
 import './App.css';
 // import ExcelView from './ExcelView'
-import {Button,Input} from 'antd';
+import {Button,Input,Card} from 'antd';
 
 import EditableTable from './EditableTable'
 import * as XLSX from 'xlsx';
@@ -82,13 +82,18 @@ function App() {
 
 
   return (
-    <>
-    <div className="mainBody" style={{padding:'22px 12px 22px 11px'}}>
-      <div className="tittle" style={{position:'absolute',marginLeft:'40%'}}>
-        <h2>Nectar Oboarding Validator</h2>
+    <div>
+   
+    <div className="headerClass">
+      <div className="header_title__10x6m">
+      Nectar Onboarding Validator
       </div>
-      {data.length == 0 ? <div className="uploadBtn" style={{marginTop:'20px',marginBottom:'12px'}}>
-      <h5>Upload csv/excel</h5>
+    </div>
+
+    <div className="site-card-border-less-wrapper" style={{marginTop:'56px',position:'absolute',width:"100%"}}>
+    <Card title={data.length>0? "Rows : "+data.length+" Validation errors : (..)": "Upload csv/excel"}  bordered={false} style={{background:'#83c5be'}} extra={
+      <div className="mainBody"   >
+      {data.length == 0 ? <div className="uploadBtn" >
       <input
         type="file"
         accept=".csv,.xlsx,.xls"
@@ -99,16 +104,18 @@ function App() {
       <Button
             onClick={handelLocalStorage}
             type="primary"
-            style={{
-              marginBottom: 16,
-            }}
+          
         >Continue with Save</Button> : null }
       </div> : null}
-      {/* {data.length>0 ? <ExcelView data={data} columnsName={columnsName}/> : null} */}
-      {data.length>0 ? <EditableTable data={data} /> : null}
+      
     </div>
-    
-    </>
+    }>
+
+    </Card>
+
+    </div>
+    {data.length>0 ? <EditableTable data={data} /> : null}
+    </div>
   );
 }
 
