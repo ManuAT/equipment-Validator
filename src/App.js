@@ -1,11 +1,10 @@
-import React,{useState,useRef} from 'react';
+import React,{useState} from 'react';
 import './App.css';
 // import ExcelView from './ExcelView'
-import {Button,Input,Card} from 'antd';
+import {Button,Card} from 'antd';
 
 import EditableTable from './EditableTable'
 import * as XLSX from 'xlsx';
-import { logDOM } from '@testing-library/dom';
 
 function App() {
   

@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { Table, Input, Button, Popconfirm, Form ,Select,Menu,Space} from 'antd';
+import { Table, Input, Button, Popconfirm, Form ,Select,Space} from 'antd';
 import Highlighter from 'react-highlight-words';
 import { SearchOutlined } from '@ant-design/icons';
 import * as XLSX from 'xlsx';
@@ -12,7 +12,7 @@ const EditableContext = React.createContext(null);
 function validator(columnName){
   switch(columnName){
     case 'client': return new RegExp(/^[a-z]+$/) //netix
-    case 'deviceId': return new RegExp(/^[A-Za-z]{3}\-[A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4}$/) //Win-3470-EF83-AAC7-0016
+    case 'deviceId': return new RegExp("^[A-Za-z]{3}\-[A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4}$") //Win-3470-EF83-AAC7-0016
     case 'community': return new RegExp(/^[a-z]+$/)//downtown
     case 'siteName': return new RegExp(/^[A-Z]{3,} [A-Z][a-z]+( [0-9]{2,})*$/)
     case 'equipmentName': return new RegExp(/^[A-Z]{3,} [A-Z0-9]{2} [A-Z]{3,} [A-Z][a-z]{2,} [A-Z][a-z]{2,} [A-Z][a-z]{2,} [A-Z]$/)
