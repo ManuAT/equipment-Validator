@@ -1,6 +1,6 @@
 import React,{useState} from 'react';
 import './App.css';
-// import ExcelView from './ExcelView'
+import ApiService from './ApiService'
 import {Button,Card} from 'antd';
 
 import EditableTable from './EditableTable'
@@ -81,8 +81,9 @@ function App() {
 
 
   return (
+    
     <div>
-   
+    <ApiService/>
     <div className="headerClass">
       <div className="header_title__10x6m">
       Nectar Onboarding Validator

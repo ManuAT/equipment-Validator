@@ -241,7 +241,18 @@ class EditableTable extends React.Component {
     constructor(props) {
       super(props);
       this.columns = [
+
         {
+          title: 'No',
+          dataIndex: 'No',
+          width: 70,
+          render:(_, record)=>{
+            // console.log({record}); this.selectDropDownValues.name?.includes(record.client)
+            const postion = this.state.dataSource.indexOf(record)
+            return <span >{postion+1}</span>
+          }
+        },
+         {
           title: 'client',
           dataIndex: 'client',
           width: 140,
