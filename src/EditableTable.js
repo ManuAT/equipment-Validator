@@ -249,7 +249,7 @@ class EditableTable extends React.Component {
           render:(_, record)=>{
             // console.log({record}); this.selectDropDownValues.name?.includes(record.client)
             const postion = this.state.dataSource.indexOf(record)
-            return <span >{postion+1}</span>
+            return <span style={{fontSize:'14px'}}>{postion+1}</span>
           }
         },
          {
@@ -597,7 +597,7 @@ class EditableTable extends React.Component {
     
         wb.SheetNames.push("sheet1");
         var rowData = [].concat(this.state.dataSource)
-        var ws = XLSX.utils.json_to_sheet(rowData.map(({key, ...remainingAttrs}) => remainingAttrs));
+        var ws = XLSX.utils.json_to_sheet(rowData.map(({key,vaildationStatus, ...remainingAttrs}) => remainingAttrs));
         wb.Sheets["sheet1"] = ws;
         var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
           function s2ab(s) { 
