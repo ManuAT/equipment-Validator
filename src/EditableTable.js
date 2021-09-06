@@ -9,7 +9,7 @@ import { saveAs } from 'file-saver'
 import './EditableTable.css'
 const EditableContext = React.createContext(null);
 
-function validator(columnName){
+function patternValidator(columnName){
   switch(columnName){
     case 'client': return new RegExp(/^[a-z]+$/) //netix
     case 'deviceId': return new RegExp("^[A-Za-z]{3}\-[A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4}$") //Win-3470-EF83-AAC7-0016
@@ -91,6 +91,17 @@ const EditableRow = ({ index, ...props }) => {
       }
     };
     // temp data
+
+    const ruleValidator = (rule, value, callback) => {
+      try {
+       if (true) {
+            throw new Error('Something wrong!'+value);
+        }
+        callback() // < -- this
+      } catch (err) {
+        callback(err);
+      }
+    }
     
   
     let childNode = children;
@@ -108,9 +119,13 @@ const EditableRow = ({ index, ...props }) => {
             rules={[
               {
                 required: true,
-                pattern: validator(title),
-                message: `${title} is required.`,
+                pattern: patternValidator(title),
+                message: `error while validation`,
               },
+              // {
+              //   validator: ruleValidator
+              // }
+              
             ]}
 
           >
@@ -262,7 +277,7 @@ class EditableTable extends React.Component {
           sortDirections: ['descend', 'ascend'],
           render:(_, record)=>{
             // console.log({record}); this.selectDropDownValues.name?.includes(record.client)
-            const isError = record.vaildationStatus?.includes("client") || this.selectDropDownValues.find(value => value.name == record.client)==undefined;
+            const isError = record.vaildationStatus?.includes("client") && this.selectDropDownValues.find(value => value.name == record.client)==undefined;
             return <span style={{color:isError?"red":"black"}}>{record.client}</span>
           }
         },
@@ -404,8 +419,9 @@ class EditableTable extends React.Component {
           sorter: (a, b) => a.servingToData.length - b.servingToData.length,
           sortDirections: ['descend', 'ascend'],
           // render:(_, record)=>{
-          //   const isError = record.vaildationStatus?.includes("servingToData");
-          //   return <span style={{color:isError?"red":"black"}}>{record.servingToData}</span>
+          //   const isError = !record.servingToData.split('@').every(item => this.selectDropDownValuesForService.includes(item));
+          //   console.log()
+          //   return <span style={{color:isError?"red":"black"}}>{record.servingToData.substring(0,25)+"..."}</span>
           // }
         },  
         {
@@ -511,10 +527,17 @@ class EditableTable extends React.Component {
       }
     ];
 
+    selectDropDownValuesForService =[
+     "SecondaryPump_ATREN 1F Secondary Pump 01_OTCI Attareen",
+    
+      "SecondaryPump_ATREN 1F Secondary Pump 02_OTCI Attareen"
+      
+    ];
+
     intialValidation = (record)=>{
       let validationArray = []
       for (let [key, value] of Object.entries(record)) {
-       if( validator(key).exec(value) == null)
+       if( patternValidator(key).exec(value) == null)
           validationArray.push(key)
     }
       return validationArray
@@ -633,7 +656,7 @@ class EditableTable extends React.Component {
             title: col.title,
             handleSave: this.handleSave,
             updateDataSourceWithValidation : this.updateDataSourceWithValidation,
-            selectDropDownValues : this.selectDropDownValues
+            selectDropDownValues : this.selectDropDownValues,
           }),
         };
       });
