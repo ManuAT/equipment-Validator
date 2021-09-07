@@ -103,7 +103,7 @@ function App() {
     </div>
       
     <div className="site-card-border-less-wrapper" style={{marginTop:'56px',position:'absolute',width:"100%"}}>
-    <Card title={data.length>0? "Rows : "+data.length+" Validation errors : (..)": "Upload csv/excel"}  bordered={false} style={{background:'#83c5be'}} extra={
+    <Card title={data.length>0? "Rows : "+data.length+" Validation errors : ": "Upload csv/excel"}  bordered={false} style={{background:'#83c5be'}} extra={
       <div className="mainBody"   >
       {data.length == 0 ? <div className="uploadBtn" >
       <input

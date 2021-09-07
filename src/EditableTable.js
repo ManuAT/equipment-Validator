@@ -499,28 +499,23 @@ class EditableTable extends React.Component {
       // addind validation to inputing data
       var dataInputFromFile = this.props.data.map(obj=> ({ ...obj, key: uuidv4() }))
       dataInputFromFile = [...dataInputFromFile].map(obj => ({...obj,vaildationStatus:this.intialValidation(obj)}))
+      var errCount = {count:0,row:[]}
+      dataInputFromFile.forEach(element => {
+        if (element.vaildationStatus.length>0)  {errCount.count+=element.vaildationStatus.length
+          errCount.row.push(dataInputFromFile.indexOf(element)+1)
+        }
+      });
+
       this.state = {
         dataSource:dataInputFromFile,
 
          // [
-        //   // {
-        //   //   key: '0',
-        //   //   name: 'Edward King 0',
-        //   //   age: '32',
-        //   //   address: 'London, Park Lane no. 0',
-        //   // },
-        //   // {
-        //   //   key: '1',
-        //   //   name: 'Edward King 1',
-        //   //   age: '32',
-        //   //   address: 'London, Park Lane no. 1',
-        //   // },
         //   { key: uuidv4(), client: 'nectar', deviceId: 'Win-3470-EF83-AAC7-0016', community:"downtown" ,siteName:'OTCI Attareen',equipmentName:'ATREN 1F FCU Lift Lobby Core A',equipmentType:'FanCoilUnit',assetCode:'0187902',pointsData:'Run Status@BMS Schedule Enable@Manual Occupancy@Return Temperature@Space Humidity@Valve Position@Supervisory Fan Speed@Fan Operation Command@Return Temperature Setpoint@Unoccupied Setpoint'}
         // ],
         count: this.props.data.length,
+        errCount:errCount
       };
     }
-
     //  selectDropDownValues =[
     //   'nectarit',
     //   'emaar',
@@ -571,7 +566,7 @@ class EditableTable extends React.Component {
       });
     };
     handleAdd = () => {
-      const { count, dataSource } = this.state;
+      const { count, dataSource,errCount } = this.state;
       const newData = {
         assetCode: "",
         client: "",
@@ -665,6 +660,7 @@ class EditableTable extends React.Component {
       });
       return (
         <div style={{zIndex:"999",position:"absolute",marginTop:"115px",padding:"6px",width:"100%"}}>
+          <div className="errCount" style={{"position":"absolute","marginLeft":"213px","marginTop":"-45px"}}> {this.state.errCount.count+' ['+this.state.errCount.row+']'}</div>
           <Button
             onClick={this.handleAdd}
             type="primary"
@@ -672,7 +668,7 @@ class EditableTable extends React.Component {
               marginBottom: 16,
             }}
           >
-            Add a row
+            Add a row 
           </Button> <Button
             onClick={this.handleDownload}
             type="primary"
