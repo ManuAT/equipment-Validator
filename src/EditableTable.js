@@ -156,7 +156,7 @@ const EditableRow = ({ index, ...props }) => {
           
 
          <div
-            className="editable-cell-value-wrap" style={{fontSize:"14px"}}
+            className="editable-cell-value-wrap" style={{fontSize:"14px",minHeight:'15px'}}
             onClick={toggleEdit}
             >
               {/* {typeof children[1] != "string"? 'noo' : children[1].length>25?children[1].substring(0,25)+"...":children[1]} */}
