@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 
-
+const baseUrl = "https://onboard-validator.herokuapp.com/api/"
 export default function ApiService() {
 
 
@@ -18,7 +18,7 @@ export default function ApiService() {
 
 export const api = async () => {
 
-   const client = await axios.get(`http://localhost:8081/api/client`, {  })
+   const client = await axios.get(baseUrl+'client', {  })
                     .then(res => {
                     // console.log(res);
                     // console.log(res.data);
@@ -26,7 +26,7 @@ export const api = async () => {
                     }).catch(error => {
                         console.error('There was an error!', error);
                     })
-    const subcommunity = await axios.get(`http://localhost:8081/api/subcommunity`, {  })
+    const subcommunity = await axios.get(baseUrl+'subcommunity', {  })
                     .then(res => {
                     // console.log(res);
                     // console.log(res.data);
@@ -34,7 +34,7 @@ export const api = async () => {
                     }).catch(error => {
                         console.error('There was an error!', error);
                     })
-    const community = await axios.get(`http://localhost:8081/api/community`, {  })
+    const community = await axios.get(baseUrl+'community', {  })
                     .then(res => {
                     // console.log(res);
                     // console.log(res.data);
@@ -43,7 +43,7 @@ export const api = async () => {
                         console.error('There was an error!', error);
                     })   
                     
-    const site = await axios.get(`http://localhost:8081/api/site`, {  })
+    const site = await axios.get(baseUrl+'site', {  })
                 .then(res => {
                 // console.log(res);
                 // console.log(res.data);
