@@ -5,7 +5,6 @@ import Highlighter from 'react-highlight-words';
 import { SearchOutlined } from '@ant-design/icons';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver'
-
 import './EditableTable.css'
 const EditableContext = React.createContext(null);
 
@@ -131,14 +130,22 @@ const EditableRow = ({ index, ...props }) => {
           >
             {
 
-              title == 'client'?( 
+              title == 'siteName' ? (
                 <Select ref={inputRef} defaultValue={children[1]} style={{ width: 100 }} onChange={save} onBlur={save} >
-                {selectDropDownValues.map((value)=> <Option key={value.id} value={value.id}>{value.name}</Option>)}
+                {selectDropDownValues["site"].map((value)=> value.ownerClientId == record.client && value.ownerName == record.community? <Option key={value.name} value={value.name}>{value.name}</Option>:null)}
+                </Select>
+              ): (
+
+              title == 'client' || title == 'community' ?( 
+                <Select ref={inputRef} defaultValue={children[1]} style={{ width: 100 }} onChange={save} onBlur={save} >
+                {selectDropDownValues[title].map((value)=> <Option key={value} value={value}>{value}</Option>)}
                 </Select>
               
               ):
                 
               (<TextArea style={{ width: '370px' }}  ref={inputRef} onPressEnter={save} onFocus={handeleValidate} onBlur={save} autoSize /> )
+
+              )
             }
 
             
@@ -277,7 +284,7 @@ class EditableTable extends React.Component {
           sortDirections: ['descend', 'ascend'],
           render:(_, record)=>{
             // console.log({record}); this.selectDropDownValues.name?.includes(record.client)
-            const isError = record.vaildationStatus?.includes("client") && this.selectDropDownValues.find(value => value.name == record.client)==undefined;
+            const isError = this.selectDropDownValues.client.find(value => value == record.client)==undefined;
             return <span style={{color:isError?"red":"black"}}>{record.client}</span>
           }
         },
@@ -303,7 +310,7 @@ class EditableTable extends React.Component {
           sorter: (a, b) => a.community.length - b.community.length,
           sortDirections: ['descend', 'ascend'],
           render:(_, record)=>{
-            const isError = record.vaildationStatus?.includes("community");
+            const isError = this.selectDropDownValues.community.find(value => value == record.community)==undefined;
             return <span style={{color:isError?"red":"black"}}>{record.community}</span>
           }
         },
@@ -316,7 +323,7 @@ class EditableTable extends React.Component {
           sorter: (a, b) => a.siteName.length - b.siteName.length,
           sortDirections: ['descend', 'ascend'],
           render:(_, record)=>{
-            const isError = record.vaildationStatus?.includes("siteName");
+            const isError = this.selectDropDownValues.site.find(value => value.name == record.siteName)==undefined;
             return <span style={{color:isError?"red":"black"}}>{record.siteName}</span>
           }
         },
@@ -514,18 +521,14 @@ class EditableTable extends React.Component {
       };
     }
 
-     selectDropDownValues =[{
-      id: 'nectarit',
-      name: 'nectarit'
-      }, {
-          id: 'emaar',
-          name: 'emaar'
-      },
-      {
-        id: 'netix',
-        name: 'netix'
-      }
-    ];
+    //  selectDropDownValues =[
+    //   'nectarit',
+    //   'emaar',
+    //   'netix',
+    // ];
+
+    selectDropDownValues = JSON.parse(localStorage.getItem('api'))
+
 
     selectDropDownValuesForService =[
      "SecondaryPump_ATREN 1F Secondary Pump 01_OTCI Attareen",

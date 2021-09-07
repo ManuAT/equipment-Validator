@@ -1,15 +1,28 @@
 import React,{useState} from 'react';
 import './App.css';
-import ApiService from './ApiService'
 import {Button,Card} from 'antd';
 
 import EditableTable from './EditableTable'
 import * as XLSX from 'xlsx';
+// import { api } from './ApiService';
 
 function App() {
   
   const [columnsName, setColumnsName] = useState([]);
   const [data, setData] = useState([]);
+   
+  // const [apiData,setApi] = useState([]);
+
+  // const dataapi = async ()=>{ 
+  //  const dataAPI = await api().then(res=>{
+  //     setApi(res)
+  //  })
+  //  return dataAPI
+  // }
+
+  // dataapi()
+  
+  // console.log(apiData)
 
   // process CSV data
   const processData = dataString => {
@@ -83,13 +96,12 @@ function App() {
   return (
     
     <div>
-    <ApiService/>
     <div className="headerClass">
       <div className="header_title__10x6m">
       Nectar Onboarding Validator
       </div>
     </div>
-
+      
     <div className="site-card-border-less-wrapper" style={{marginTop:'56px',position:'absolute',width:"100%"}}>
     <Card title={data.length>0? "Rows : "+data.length+" Validation errors : (..)": "Upload csv/excel"}  bordered={false} style={{background:'#83c5be'}} extra={
       <div className="mainBody"   >
@@ -114,7 +126,7 @@ function App() {
     </Card>
 
     </div>
-    {data.length>0 ? <EditableTable data={data} /> : null}
+    {data.length>0 ? <EditableTable data={data}  /> : null}
     </div>
   );
 }

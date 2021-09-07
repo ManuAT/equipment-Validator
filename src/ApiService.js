@@ -1,50 +1,60 @@
-import React from 'react'
 import axios from 'axios'
 
 
 
 export default function ApiService() {
 
-    // const auth = {
-    //     userName: 'riyas@nectarit',
-    //     password:'Welcome@123'
-    //   };
-  
-    //   axios.post(`https://assets.nectarit.com/api/token/login`, { auth })
-    //   .then(res => {
-    //     console.log(res);
-    //     console.log(res.data);
-    //   }).catch(error => {
-    //         console.error('There was an error!', error);
-    //     });
-    // axios.post(baseURL, {
-    //     title: "Hello World!",
-    //     body: "This is a new post."
-    //   }).then((response) => {
-    //     // setPost(response.data);
-    //     console.log(response)
+
+    //  axios.get(`http://localhost:8081/api/client`, {  })
+    // .then(res => {
+    //   // console.log(res);
+    //   console.log(res.data);
+    //   return res.data
+    // }).catch(error => {
+    //       console.error('There was an error!', error);
     //   });
-    function handleGetDomian() {
-    
-        return [{
-            id: 'nectarit',
-            name: 'nectarit'
-            }, {
-                id: 'emaar',
-                name: 'emaar'
-            },
-            {
-              id: 'netix',
-              name: 'netix'
-            }
-          ]
-    }
 
-
-    return (
-        <div>   
-            
-        </div>
-    )
 }
 
+export const api = async () => {
+
+   const client = await axios.get(`http://localhost:8081/api/client`, {  })
+                    .then(res => {
+                    // console.log(res);
+                    // console.log(res.data);
+                    return res.data
+                    }).catch(error => {
+                        console.error('There was an error!', error);
+                    })
+    const subcommunity = await axios.get(`http://localhost:8081/api/subcommunity`, {  })
+                    .then(res => {
+                    // console.log(res);
+                    // console.log(res.data);
+                    return res.data
+                    }).catch(error => {
+                        console.error('There was an error!', error);
+                    })
+    const community = await axios.get(`http://localhost:8081/api/community`, {  })
+                    .then(res => {
+                    // console.log(res);
+                    // console.log(res.data);
+                    return res.data
+                    }).catch(error => {
+                        console.error('There was an error!', error);
+                    })   
+                    
+    const site = await axios.get(`http://localhost:8081/api/site`, {  })
+                .then(res => {
+                // console.log(res);
+                // console.log(res.data);
+                return res.data
+                }).catch(error => {
+                    console.error('There was an error!', error);
+                })
+    // console.log(client,subcommunity,community,site)
+    localStorage.setItem('api',JSON.stringify({client,subcommunity,community,site}))
+    // return {client,subcommunity,community,site} 
+    
+    }
+
+    
