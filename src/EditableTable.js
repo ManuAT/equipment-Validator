@@ -660,7 +660,7 @@ class EditableTable extends React.Component {
       });
       return (
         <div style={{zIndex:"999",position:"absolute",marginTop:"115px",padding:"6px",width:"100%"}}>
-          <div className="errCount" style={{"position":"absolute","marginLeft":"213px","marginTop":"-45px"}}> {this.state.errCount.count+' ['+this.state.errCount.row+']'}</div>
+          <div className="errCount" style={{"position":"absolute","marginLeft":"240px","marginTop":"-45px"}}> {this.state.errCount.count+' ['+this.state.errCount.row+']'}</div>
           <Button
             onClick={this.handleAdd}
             type="primary"
