@@ -130,13 +130,19 @@ const EditableRow = ({ index, ...props }) => {
           >
             {
 
+              title == 'community' ? (
+                <Select ref={inputRef} defaultValue={children[1]} style={{ width: 100 }} onChange={save} onBlur={save} >
+                {selectDropDownValues["community"].map((value)=> value.clientName == record.client? <Option key={value.clientId} value={value.clientId}>{value.clientId}</Option>:null)}
+                </Select>
+              ):(
+
               title == 'siteName' ? (
                 <Select ref={inputRef} defaultValue={children[1]} style={{ width: 100 }} onChange={save} onBlur={save} >
                 {selectDropDownValues["site"].map((value)=> value.ownerName == record.client && value.ownerClientId == record.community? <Option key={value.name} value={value.name}>{value.name}</Option>:null)}
                 </Select>
               ): (
 
-              title == 'client' || title == 'community' ?( 
+              title == 'client'  ?( 
                 <Select ref={inputRef} defaultValue={children[1]} style={{ width: 100 }} onChange={save} onBlur={save} >
                 {selectDropDownValues[title].map((value)=> <Option key={value} value={value}>{value}</Option>)}
                 </Select>
@@ -145,6 +151,7 @@ const EditableRow = ({ index, ...props }) => {
                 
               (<TextArea style={{ width: '370px' }}  ref={inputRef} onPressEnter={save} onFocus={handeleValidate} onBlur={save} autoSize /> )
 
+              )
               )
             }
 
@@ -310,7 +317,7 @@ class EditableTable extends React.Component {
           sorter: (a, b) => a.community.length - b.community.length,
           sortDirections: ['descend', 'ascend'],
           render:(_, record)=>{
-            const isError = this.selectDropDownValues.community.find(value => value == record.community)==undefined;
+            const isError = this.selectDropDownValues.community.find(value => value.clientId == record.community)==undefined;
             return <span style={{color:isError?"red":"black"}}>{record.community}</span>
           }
         },
