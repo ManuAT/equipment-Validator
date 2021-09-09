@@ -1,8 +1,8 @@
 import axios from 'axios'
 
 
-// const baseUrl = "http://localhost:8081/api/"
-const baseUrl = "https://onboard-validator.herokuapp.com/api/"
+const baseUrl = "http://localhost:8081/api/"
+// const baseUrl = "https://onboard-validator.herokuapp.com/api/"
 export default function ApiService() {
 
 
@@ -52,8 +52,16 @@ export const api = async () => {
                 }).catch(error => {
                     console.error('There was an error!', error);
                 })
+    const deviceId = await axios.get(baseUrl+'device', {  })
+                    .then(res => {
+                    // console.log(res);
+                    // console.log(res.data);
+                    return res.data
+                    }).catch(error => {
+                        console.error('There was an error!', error);
+                    })
     // console.log(client,subcommunity,community,site)
-    localStorage.setItem('api',JSON.stringify({client,subcommunity,community,site}))
+    localStorage.setItem('api',JSON.stringify({client,subcommunity,community,site,deviceId}))
     // return {client,subcommunity,community,site} 
     
     }

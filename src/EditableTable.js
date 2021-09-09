@@ -10,16 +10,16 @@ const EditableContext = React.createContext(null);
 
 function patternValidator(columnName){
   switch(columnName){
-    case 'client': return new RegExp(/^[a-z]+$/) //netix
+    // case 'client': return new RegExp(/^[A-Za-z]+( [0-9]+)*$/) //netix
     case 'deviceId': return new RegExp("^[A-Za-z]{3}\-[A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4}$") //Win-3470-EF83-AAC7-0016
-    case 'community': return new RegExp(/^[a-z]+$/)//downtown
-    case 'siteName': return new RegExp(/^[A-Z]{3,} [A-Z][a-z]+( [0-9]{2,})*$/)
+    // case 'community': return new RegExp(/^[a-z]+$/)//downtown
+    // case 'siteName': return new RegExp(/^[A-Za-z]{3,} [A-Z][a-z]+( [0-9]{2,})*$/)
     case 'equipmentName': return new RegExp(/^[A-Z]{3,} [A-Z0-9]{2} [A-Z]{3,} [A-Z][a-z]{2,} [A-Z][a-z]{2,} [A-Z][a-z]{2,} [A-Z]$/)
     case 'equipmentType': return new RegExp(/^[a-zA-Z]+$/)
     case 'assetCode': return new RegExp(/^[0-9]{7}$/)
    
     
-    default: return new RegExp(/^.*$/)
+    default: return new RegExp(/^.*$/)  
 
   }
 }
@@ -67,7 +67,7 @@ const EditableRow = ({ index, ...props }) => {
   
     const save = async () => {
       try {
-        var validArray = []
+
         const values = await form.validateFields();
         toggleEdit();
         // console.log(Object.keys(values))
@@ -76,9 +76,13 @@ const EditableRow = ({ index, ...props }) => {
 
       } catch (errInfo) {
         console.log('Save failed:', errInfo);
-        toggleEdit();
-        handleSave({ ...record, ...errInfo.values});
-        updateDataSourceWithValidation(record,errInfo.errorFields[0].name,true)
+
+        // string validation space need to look it later ----------
+
+        // toggleEdit();
+
+        // handleSave({ ...record, ...errInfo.values});
+        // updateDataSourceWithValidation(record,errInfo.errorFields[0].name,true)
       }
     };
 
@@ -93,9 +97,24 @@ const EditableRow = ({ index, ...props }) => {
 
     const ruleValidator = (rule, value, callback) => {
       try {
-       if (true) {
-            throw new Error('Something wrong!'+value);
+      //  if (true) {
+      //       throw new Error('Something wrong!'+value);
+      //   }
+
+        if(selectDropDownValues.client.find(data => data == record.client)==undefined && title=='client'){
+          // console.log("hello");
+
+            throw new Error('not in the list!');
         }
+
+        if(selectDropDownValues.community.find(data => data.clientId == record.community && data.clientName == record.client)==undefined && title=='community'){
+          throw new Error('not in the list!');
+        }
+
+        if(selectDropDownValues.site.find(data => data.name == record.siteName && data.ownerName == record.client && data.ownerClientId == record.community )==undefined && title=='siteName'){
+          throw new Error('not in the list!');
+        }
+
         callback() // < -- this
       } catch (err) {
         callback(err);
@@ -117,9 +136,9 @@ const EditableRow = ({ index, ...props }) => {
 
             rules={[
               {
-                required: true,
-                pattern: patternValidator(title),
-                message: `error while validation`,
+                // required: title == 'client' || title == 'community' || title =='siteName' || title == 'equipmentName' || title =='equipmentType'? true:false,
+                // pattern: patternValidator(title),
+                message: `error while validation/ required`,
               },
               // {
               //   validator: ruleValidator
@@ -131,19 +150,19 @@ const EditableRow = ({ index, ...props }) => {
             {
 
               title == 'community' ? (
-                <Select ref={inputRef} defaultValue={children[1]} style={{ width: 100 }} onChange={save} onBlur={save} >
+                <Select ref={inputRef} defaultValue={children[1]} style={{ width: "100%" }} onChange={save} onBlur={save} >
                 {selectDropDownValues["community"].map((value)=> value.clientName == record.client? <Option key={value.clientId} value={value.clientId}>{value.clientId}</Option>:null)}
                 </Select>
               ):(
 
               title == 'siteName' ? (
-                <Select ref={inputRef} defaultValue={children[1]} style={{ width: 100 }} onChange={save} onBlur={save} >
+                <Select ref={inputRef} defaultValue={children[1]} style={{ width: "100%" }} onChange={save} onBlur={save} >
                 {selectDropDownValues["site"].map((value)=> value.ownerName == record.client && value.ownerClientId == record.community? <Option key={value.name} value={value.name}>{value.name}</Option>:null)}
                 </Select>
               ): (
 
-              title == 'client'  ?( 
-                <Select ref={inputRef} defaultValue={children[1]} style={{ width: 100 }} onChange={save} onBlur={save} >
+              title == 'client' || title == 'deviceId' ?( 
+                <Select ref={inputRef} defaultValue={children[1]} style={{ width: "100%" }} onChange={save} onBlur={save} >
                 {selectDropDownValues[title].map((value)=> <Option key={value} value={value}>{value}</Option>)}
                 </Select>
               
@@ -290,8 +309,8 @@ class EditableTable extends React.Component {
           sorter: (a, b) => a.client.length - b.client.length,
           sortDirections: ['descend', 'ascend'],
           render:(_, record)=>{
-            // console.log({record}); this.selectDropDownValues.name?.includes(record.client)
-            const isError = this.selectDropDownValues.client.find(value => value == record.client)==undefined;
+            // console.log({record}); this.selectDropDownValues.name?.includes(record.client) this.selectDropDownValues.client.find(value => value == record.client)==undefined;
+            const isError = record.vaildationStatus?.includes('client') 
             return <span style={{color:isError?"red":"black"}}>{record.client}</span>
           }
         },
@@ -317,20 +336,20 @@ class EditableTable extends React.Component {
           sorter: (a, b) => a.community.length - b.community.length,
           sortDirections: ['descend', 'ascend'],
           render:(_, record)=>{
-            const isError = this.selectDropDownValues.community.find(value => value.clientId == record.community)==undefined;
+            const isError = this.selectDropDownValues.community.find(value => value.clientId == record.community && value.clientName == record.client)==undefined;
             return <span style={{color:isError?"red":"black"}}>{record.community}</span>
           }
         },
         {
           title: 'siteName',
           dataIndex: 'siteName',
-          width: 150,
+          width: 200,
           editable: true,
           ...this.getColumnSearchProps('siteName'),
           sorter: (a, b) => a.siteName.length - b.siteName.length,
           sortDirections: ['descend', 'ascend'],
           render:(_, record)=>{
-            const isError = this.selectDropDownValues.site.find(value => value.name == record.siteName)==undefined;
+            const isError = this.selectDropDownValues.site.find(value => value.name == record.siteName && value.ownerName == record.client && value.ownerClientId == record.community )==undefined;
             return <span style={{color:isError?"red":"black"}}>{record.siteName}</span>
           }
         },
@@ -505,7 +524,7 @@ class EditableTable extends React.Component {
 
       // addind validation to inputing data
       var dataInputFromFile = this.props.data.map(obj=> ({ ...obj, key: uuidv4() }))
-      dataInputFromFile = [...dataInputFromFile].map(obj => ({...obj,vaildationStatus:this.intialValidation(obj)}))
+      dataInputFromFile = [...dataInputFromFile].map(obj => ({...obj,vaildationStatus:this.intialValidation(obj,dataInputFromFile)}))
       var errCount = {count:0,row:[]}
       dataInputFromFile.forEach(element => {
         if (element.vaildationStatus.length>0)  {errCount.count+=element.vaildationStatus.length
@@ -539,30 +558,57 @@ class EditableTable extends React.Component {
       
     ];
 
-    intialValidation = (record)=>{
+    intialValidation = (record,data)=>{
+      const equipmentTypeList = data.map(item => item.equipmentName)
+
       let validationArray = []
       for (let [key, value] of Object.entries(record)) {
-       if( patternValidator(key).exec(value) == null)
+      //  if( patternValidator(key).exec(value) == null){
+
+      //     validationArray.push(key)
+      //   }
+        if(equipmentTypeList.indexOf(record.equipmentName) != equipmentTypeList.lastIndexOf(record.equipmentName) && key == 'equipmentName'){
           validationArray.push(key)
+        }
+
+        if(this.selectDropDownValues.client.find(value => value == record.client)==undefined && key=='client'){
+            validationArray.push(key)
+        }
+
+        if(this.selectDropDownValues.deviceId.find(value => value == record.deviceId)==undefined && key=='deviceId'){
+          validationArray.push(key)
+        }
+
+        if(this.selectDropDownValues.community.find(value => value.clientId == record.community && value.clientName == record.client)==undefined && key=='community'){
+          validationArray.push(key)
+         }
+
+         if(this.selectDropDownValues.site.find(value => value.name == record.siteName && value.ownerName == record.client && value.ownerClientId == record.community )==undefined && key=='siteName'){
+          validationArray.push(key)
+         }
     }
       return validationArray
     }
 
     updateDataSourceWithValidation = (record,validationArray,action)=>{
+      console.log("err",record,validationArray,action);
 
+      const dataSource = [...this.state.dataSource].map(obj => ({...obj,vaildationStatus:this.intialValidation(obj,[...this.state.dataSource])}));
 
-      const dataSource = [...this.state.dataSource];
+       // update error count
+       var errCount = {count:0,row:[]}
+       dataSource.forEach(element => {
+         if (element.vaildationStatus.length>0)  {errCount.count+=element.vaildationStatus.length
+           errCount.row.push(dataSource.indexOf(element)+1)
+         }
+       });
+
       this.setState({
-        dataSource: dataSource.map((item) => {        
-        var temp = Object.assign({}, item);
-        if (temp.key == record.key) {
-          action? temp.vaildationStatus = [...temp.vaildationStatus].concat(validationArray) : temp.vaildationStatus = temp.vaildationStatus.filter( ( el ) => !validationArray.includes( el ) )
-        }
-        return temp;
-      })
-
+        dataSource:  dataSource,
+        errCount : errCount
       });
 
+     
       console.log("data",[...this.state.dataSource])
     }
   
@@ -604,10 +650,17 @@ class EditableTable extends React.Component {
       const index = newData.findIndex((item) => row.key === item.key);
       const item = newData[index];
       newData.splice(index, 1, { ...item, ...row });
-      localStorage.setItem('validatorData',JSON.stringify(newData));
+
+      
+
+
       this.setState({
         dataSource: newData, 
       });
+
+      localStorage.setItem('validatorData',JSON.stringify(newData));
+
+
     };
     
 
@@ -692,6 +745,7 @@ class EditableTable extends React.Component {
             dataSource={dataSource}
             columns={columns}
             scroll={{x: 1800, y: 550 }}
+            pagination={false} 
           />
         </div>
       );
