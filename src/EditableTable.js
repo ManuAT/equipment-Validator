@@ -157,7 +157,7 @@ const EditableRow = ({ index, ...props }) => {
 
               title == 'siteName' ? (
                 <Select ref={inputRef} defaultValue={children[1]} style={{ width: "100%" }} onChange={save} onBlur={save} >
-                {selectDropDownValues["site"].map((value)=> value.ownerName == record.client && value.ownerClientId == record.community? <Option key={value.name} value={value.name}>{value.name}</Option>:null)}
+                {selectDropDownValues["site"].map((value)=> value.domain == record.client && value.ownerClientId == record.community? <Option key={value.name} value={value.name}>{value.name}</Option>:null)}
                 </Select>
               ): (
 
@@ -376,7 +376,7 @@ class EditableTable extends React.Component {
           sorter: (a, b) => a.siteName.length - b.siteName.length,
           sortDirections: ['descend', 'ascend'],
           render:(_, record)=>{
-            const isError = this.selectDropDownValues.site.find(value => value.name == record.siteName && value.ownerName == record.client && value.ownerClientId == record.community )==undefined;
+            const isError = this.selectDropDownValues.site.find(value => value.name == record.siteName && value.domain == record.client && value.ownerClientId == record.community )==undefined;
             return <span style={{color:isError?"red":"black"}}>{record.siteName}</span>
           }
         },
@@ -610,7 +610,7 @@ class EditableTable extends React.Component {
           validationArray.push(key)
          }
 
-         if(this.selectDropDownValues.site.find(value => value.name == record.siteName && value.ownerName == record.client && value.ownerClientId == record.community )==undefined && key=='siteName'){
+         if(this.selectDropDownValues.site.find(value => value.name == record.siteName && value.domain == record.client && value.ownerClientId == record.community )==undefined && key=='siteName'){
           validationArray.push(key)
          }
     }
