@@ -48,7 +48,6 @@ const EditableRow = ({ index, ...props }) => {
     selectDropDownValues,
     ...restProps
   }) => {
-    // console.log(children[1]);
     const [editing, setEditing] = useState(false);
     const inputRef = useRef(null);
     const form = useContext(EditableContext);
@@ -70,7 +69,6 @@ const EditableRow = ({ index, ...props }) => {
 
         const values = await form.validateFields();
         toggleEdit();
-        console.log(values)
         handleSave({ ...record, ...values });
         updateDataSourceWithValidation(record,Object.keys(values),false)
 
@@ -90,7 +88,6 @@ const EditableRow = ({ index, ...props }) => {
       try {
         const values = await form.validateFields();
       } catch (errInfo) {
-        // console.log('validation errors:', errInfo);
       }
     };
     // temp data
@@ -102,7 +99,6 @@ const EditableRow = ({ index, ...props }) => {
       //   }
 
         if(selectDropDownValues.client.find(data => data == record.client)==undefined && title=='client'){
-          // console.log("hello");
 
             throw new Error('not in the list!');
         }
@@ -295,7 +291,6 @@ class EditableTable extends React.Component {
 
   handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
-    console.log(this.allSelectCheckBox);
     this.setState({
       searchText: selectedKeys[0],
       searchedColumn: dataIndex,
@@ -322,7 +317,7 @@ class EditableTable extends React.Component {
           dataIndex: 'No',
           width: 70,
           render:(_, record)=>{
-            // console.log({record}); this.selectDropDownValues.name?.includes(record.client)
+            //  this.selectDropDownValues.name?.includes(record.client)
             const postion = this.state.dataSource.indexOf(record)
             return <span style={{fontSize:'14px'}}>{postion+1}</span>
           }
@@ -336,7 +331,7 @@ class EditableTable extends React.Component {
           sorter: (a, b) => a.client.length - b.client.length,
           sortDirections: ['descend', 'ascend'],
           render:(_, record)=>{
-            // console.log({record}); this.selectDropDownValues.name?.includes(record.client) this.selectDropDownValues.client.find(value => value == record.client)==undefined;
+            //  this.selectDropDownValues.name?.includes(record.client) this.selectDropDownValues.client.find(value => value == record.client)==undefined;
             const isError = record.vaildationStatus?.includes('client') 
             return <span style={{color:isError?"red":"black"}}>{record.client}</span>
           }
@@ -480,7 +475,6 @@ class EditableTable extends React.Component {
           sortDirections: ['descend', 'ascend'],
           // render:(_, record)=>{
           //   const isError = !record.servingToData.split('@').every(item => this.selectDropDownValuesForService.includes(item));
-          //   console.log()
           //   return <span style={{color:isError?"red":"black"}}>{record.servingToData.substring(0,25)+"..."}</span>
           // }
         },  
@@ -618,7 +612,6 @@ class EditableTable extends React.Component {
     }
 
     updateDataSourceWithValidation = (record,validationArray,action)=>{
-      // console.log("err",record,validationArray,action);
 
       const dataSource = [...this.state.dataSource].map(obj => ({...obj,vaildationStatus:this.intialValidation(obj,[...this.state.dataSource])}));
 
@@ -636,7 +629,6 @@ class EditableTable extends React.Component {
       });
 
      
-      console.log("data",[...this.state.dataSource])
     }
   
     handleDelete = (key) => {
@@ -720,7 +712,6 @@ class EditableTable extends React.Component {
 
     render() {
       const { dataSource } = this.state;
-      // console.log(dataSource);
 
       const components = {
         body: {
