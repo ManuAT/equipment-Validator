@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { Table, Input, Button, Popconfirm, Form ,Select,Space} from 'antd';
+import { Table, Input, Button, Popconfirm, Form ,Select,Space,Checkbox} from 'antd';
 import Highlighter from 'react-highlight-words';
 import { SearchOutlined } from '@ant-design/icons';
 import * as XLSX from 'xlsx';
@@ -70,7 +70,7 @@ const EditableRow = ({ index, ...props }) => {
 
         const values = await form.validateFields();
         toggleEdit();
-        // console.log(Object.keys(values))
+        console.log(values)
         handleSave({ ...record, ...values });
         updateDataSourceWithValidation(record,Object.keys(values),false)
 
@@ -151,7 +151,7 @@ const EditableRow = ({ index, ...props }) => {
 
               title == 'community' ? (
                 <Select ref={inputRef} defaultValue={children[1]} style={{ width: "100%" }} onChange={save} onBlur={save} >
-                {selectDropDownValues["community"].map((value)=> value.clientName == record.client? <Option key={value.clientId} value={value.clientId}>{value.clientId}</Option>:null)}
+                {selectDropDownValues["community"].map((value)=> value.domain == record.client? <Option key={value.clientName} value={value.clientName}>{value.clientName}</Option>:null)}
                 </Select>
               ):(
 
@@ -216,6 +216,18 @@ class EditableTable extends React.Component {
           onPressEnter={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
           style={{ marginBottom: 8, display: 'block' }}
         />
+        {/* replce code */}
+      <Input
+          ref={node => {
+            this.replaceInput = node;
+          }}
+          placeholder={`Replace ${dataIndex}`}
+          value={selectedKeys[1]}
+          // onChange={e => this.setState( e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{ marginBottom: 8, display: 'block' }}
+        />
+        <Checkbox ref={node => {this.allSelectCheckBox = node;}}>|Aa|</Checkbox>
         <Space>
           <Button
             type="primary"
@@ -246,10 +258,22 @@ class EditableTable extends React.Component {
       </div>
     ),
     filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
-    onFilter: (value, record) =>
-      record[dataIndex]
-        ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
-        : '',
+    onFilter: (value, record) =>{
+      // let replacementValue =''
+      let newRecord = record[dataIndex].toString()
+      const filType = record[dataIndex] ? record[dataIndex].toString().includes(value) : false
+      if(this.replaceInput.state.value && filType){
+        const replacementValue = this.replaceInput.state.value
+        var regx = this.allSelectCheckBox.state.checked ?  new RegExp("^"+value+"$") : value;
+        const newRecord2 =  newRecord.replace(regx,replacementValue)
+        record[dataIndex] = newRecord2
+        if (newRecord != newRecord2){
+        this.handleSave({...record})
+        this.updateDataSourceWithValidation()
+        }
+      }
+      return filType
+    },
     onFilterDropdownVisibleChange: visible => {
       if (visible) {
         setTimeout(() => this.searchInput.select(), 100);
@@ -271,15 +295,18 @@ class EditableTable extends React.Component {
 
   handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
+    console.log(this.allSelectCheckBox);
     this.setState({
       searchText: selectedKeys[0],
       searchedColumn: dataIndex,
     });
-  };
+  };    
 
   handleReset = clearFilters => {
     clearFilters();
     this.setState({ searchText: '' });
+    this.replaceInput.state.value = ""
+    this.allSelectCheckBox.state.checked = false
   };
 
 
@@ -336,7 +363,7 @@ class EditableTable extends React.Component {
           sorter: (a, b) => a.community.length - b.community.length,
           sortDirections: ['descend', 'ascend'],
           render:(_, record)=>{
-            const isError = this.selectDropDownValues.community.find(value => value.clientId == record.community && value.clientName == record.client)==undefined;
+            const isError = this.selectDropDownValues.community.find(value => value.clientName == record.community && value.domain == record.client)==undefined;
             return <span style={{color:isError?"red":"black"}}>{record.community}</span>
           }
         },
@@ -579,7 +606,7 @@ class EditableTable extends React.Component {
           validationArray.push(key)
         }
 
-        if(this.selectDropDownValues.community.find(value => value.clientId == record.community && value.clientName == record.client)==undefined && key=='community'){
+        if(this.selectDropDownValues.community.find(value => value.clientName == record.community && value.domain == record.client)==undefined && key=='community'){
           validationArray.push(key)
          }
 
@@ -591,7 +618,7 @@ class EditableTable extends React.Component {
     }
 
     updateDataSourceWithValidation = (record,validationArray,action)=>{
-      console.log("err",record,validationArray,action);
+      // console.log("err",record,validationArray,action);
 
       const dataSource = [...this.state.dataSource].map(obj => ({...obj,vaildationStatus:this.intialValidation(obj,[...this.state.dataSource])}));
 
@@ -688,6 +715,7 @@ class EditableTable extends React.Component {
             return buf;    
           }
           saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'test.xlsx');
+          localStorage.removeItem('api')
 }
 
     render() {
