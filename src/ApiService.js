@@ -27,15 +27,17 @@ export const api = async () => {
                     }).catch(error => {
                         console.error('There was an error!', error);
                     })
-    const subcommunity = await axios.get(baseUrl+'subcommunity', {  })
-                    .then(res => {
-                    // console.log(res);
-                    // console.log(res.data);
-                    return res.data
-                    }).catch(error => {
-                        console.error('There was an error!', error);
-                    })
-    const community = await axios.get(baseUrl+'community', {  })
+    // console.log('clientLenght'+client.length);
+    // const subcommunity = await axios.get(baseUrl+'subcommunity', {  })
+    //                 .then(res => {
+    //                 // console.log(res);
+    //                 // console.log(res.data);
+    //                 return res.data
+    //                 }).catch(error => {
+    //                     console.error('There was an error!', error);
+    //                 })
+
+    const community= await axios.get(baseUrl+'community', {params:{domain:'nectarit'}})
                     .then(res => {
                     // console.log(res);
                     // console.log(res.data);
@@ -61,7 +63,12 @@ export const api = async () => {
                         console.error('There was an error!', error);
                     })
     // console.log(client,subcommunity,community,site)
-    localStorage.setItem('api',JSON.stringify({client,subcommunity,community,site,deviceId}))
+
+    const equipmentType = [{domain:'nectarit',equipName:'FanCoilUnit'},{domain:'nectarit',equipName:'BTUMeter'},{domain:'nectarit',equipName:'BoosterPump'},{domain:'nectarit',equipName:'DDCController'}]
+
+    const pointsData = [{domain:'nectarit',equipName:'FanCoilUnit',point:'Run Status'},{domain:'nectarit',equipName:'BTUMeter',point:'Manual Occupancy'},{domain:'nectarit',equipName:'BoosterPump',point:'Return Temperature'},{domain:'nectarit',equipName:'DDCController',point:'Space Humidity'}]
+
+    localStorage.setItem('api',JSON.stringify({client,community,site,deviceId,equipmentType,pointsData}))
     // return {client,subcommunity,community,site} 
     
     }

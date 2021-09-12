@@ -70,17 +70,19 @@ const EditableRow = ({ index, ...props }) => {
         const values = await form.validateFields();
         toggleEdit();
         handleSave({ ...record, ...values });
-        updateDataSourceWithValidation(record,Object.keys(values),false)
+        // updateDataSourceWithValidation(record,Object.keys(values),false)
+        updateDataSourceWithValidation()
 
       } catch (errInfo) {
-        console.log('Save failed:', errInfo);
+        console.log('Save with error:', errInfo);
 
         // string validation space need to look it later ----------
 
-        // toggleEdit();
+        toggleEdit();
 
-        // handleSave({ ...record, ...errInfo.values});
+        handleSave({ ...record, ...errInfo.values});
         // updateDataSourceWithValidation(record,errInfo.errorFields[0].name,true)
+        updateDataSourceWithValidation()
       }
     };
 
@@ -94,22 +96,31 @@ const EditableRow = ({ index, ...props }) => {
 
     const ruleValidator = (rule, value, callback) => {
       try {
-      //  if (true) {
-      //       throw new Error('Something wrong!'+value);
-      //   }
-
-        if(selectDropDownValues.client.find(data => data == record.client)==undefined && title=='client'){
-
-            throw new Error('not in the list!');
+       if (title=='pointsData' && record.vaildationStatus.includes('pointsData')) {
+        
+            const pointData = value.split('@').filter(e=> !selectDropDownValues.pointsData.map(item  =>{
+              if(item.domain == record.client && item.equipName == record.equipmentType)
+              return item.point
+            } ).includes(e)) 
+            // console.log("value at validation",pointData)
+            // throw new Error(pointData);
+            callback(pointData.join())
         }
 
-        if(selectDropDownValues.community.find(data => data.clientId == record.community && data.clientName == record.client)==undefined && title=='community'){
-          throw new Error('not in the list!');
-        }
+        // if(selectDropDownValues.client.find(data => data == record.client)==undefined && title=='client'){
 
-        if(selectDropDownValues.site.find(data => data.name == record.siteName && data.ownerName == record.client && data.ownerClientId == record.community )==undefined && title=='siteName'){
-          throw new Error('not in the list!');
-        }
+        //     throw new Error('not in the list!');
+        // }
+
+        // if(selectDropDownValues.community.find(data => data.clientId == record.community && data.clientName == record.client)==undefined && title=='community'){
+        //   throw new Error('not in the list!');
+        // }
+
+        // if(selectDropDownValues.site.find(data => data.name == record.siteName && data.ownerName == record.client && data.ownerClientId == record.community )==undefined && title=='siteName'){
+        //   throw new Error('not in the list!');
+        // }
+
+
 
         callback() // < -- this
       } catch (err) {
@@ -136,14 +147,25 @@ const EditableRow = ({ index, ...props }) => {
                 // pattern: patternValidator(title),
                 message: `error while validation/ required`,
               },
-              // {
-              //   validator: ruleValidator
-              // }
+              {
+                validator: ruleValidator
+              }
               
             ]}
 
           >
             {
+              title == 'pointsData' ? (
+              
+                <TextArea style={{ width: '370px' }}  ref={inputRef} onPressEnter={save} onFocus={handeleValidate} onBlur={save} autoSize /> 
+            
+              ):(
+              title == 'equipmentType' ? (
+                <Select ref={inputRef} defaultValue={children[1]} style={{ width: "100%" }} onChange={save} onBlur={save} >
+                {selectDropDownValues["equipmentType"].map((value)=> value.domain == record.client? <Option key={value.equipName} value={value.equipName}>{value.equipName}</Option>:null)}
+                </Select>
+              ):(
+              
 
               title == 'community' ? (
                 <Select ref={inputRef} defaultValue={children[1]} style={{ width: "100%" }} onChange={save} onBlur={save} >
@@ -166,6 +188,8 @@ const EditableRow = ({ index, ...props }) => {
                 
               (<TextArea style={{ width: '370px' }}  ref={inputRef} onPressEnter={save} onFocus={handeleValidate} onBlur={save} autoSize /> )
 
+              )
+              )
               )
               )
             }
@@ -358,7 +382,8 @@ class EditableTable extends React.Component {
           sorter: (a, b) => a.community.length - b.community.length,
           sortDirections: ['descend', 'ascend'],
           render:(_, record)=>{
-            const isError = this.selectDropDownValues.community.find(value => value.clientName == record.community && value.domain == record.client)==undefined;
+            //  this.selectDropDownValues.community.find(value => value.clientName == record.community && value.domain == record.client)==undefined;
+            const isError = record.vaildationStatus?.includes("community");
             return <span style={{color:isError?"red":"black"}}>{record.community}</span>
           }
         },
@@ -371,7 +396,8 @@ class EditableTable extends React.Component {
           sorter: (a, b) => a.siteName.length - b.siteName.length,
           sortDirections: ['descend', 'ascend'],
           render:(_, record)=>{
-            const isError = this.selectDropDownValues.site.find(value => value.name == record.siteName && value.domain == record.client && value.ownerClientId == record.community )==undefined;
+            // this.selectDropDownValues.site.find(value => value.name == record.siteName && value.domain == record.client && value.ownerClientId == record.community )==undefined;
+            const isError = record.vaildationStatus?.includes("siteName");
             return <span style={{color:isError?"red":"black"}}>{record.siteName}</span>
           }
         },
@@ -397,6 +423,7 @@ class EditableTable extends React.Component {
           sorter: (a, b) => a.equipmentType.length - b.equipmentType.length,
           sortDirections: ['descend', 'ascend'],
           render:(_, record)=>{
+            // this.selectDropDownValues.equipmentType.find(value => value.equipName == record.equipmentType && value.domain == record.client)==undefined;
             const isError = record.vaildationStatus?.includes("equipmentType");
             return <span style={{color:isError?"red":"black"}}>{record.equipmentType}</span>
           }
@@ -422,10 +449,10 @@ class EditableTable extends React.Component {
           ...this.getColumnSearchProps('pointsData'),
           sorter: (a, b) => a.pointsData.length - b.pointsData.length,
           sortDirections: ['descend', 'ascend'],
-          // render:(_, record)=>{
-          //   const isError = record.vaildationStatus?.includes("pointsData");
-          //   return <span style={{color:isError?"red":"black"}}>{record.pointsData}</span>
-          // }
+          render:(_, record)=>{
+            const isError = record.vaildationStatus?.includes("pointsData");
+            return <span style={{color:isError?"red":"black"}}>{record.pointsData.substring(0,25)+"..."}</span>
+          }
         },
         {
           title: 'roomsData',
@@ -604,7 +631,15 @@ class EditableTable extends React.Component {
           validationArray.push(key)
          }
 
+         if(this.selectDropDownValues.equipmentType.find(value => value.equipName == record.equipmentType && value.domain == record.client)==undefined && key=='equipmentType'){
+          validationArray.push(key)
+         }
+
          if(this.selectDropDownValues.site.find(value => value.name == record.siteName && value.domain == record.client && value.ownerClientId == record.community )==undefined && key=='siteName'){
+          validationArray.push(key)
+         }
+// !record.pointsData.split('@').every(item => this.selectDropDownValues.pointsData.map(e=>e.point)).includes(item) &&
+         if(this.selectDropDownValues.pointsData.find(value => value.equipName == record.equipmentType && value.domain == record.client && record.pointsData.split('@').every(item =>value.point == item))==undefined && key=='pointsData'){
           validationArray.push(key)
          }
     }
