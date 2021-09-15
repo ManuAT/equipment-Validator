@@ -8,6 +8,9 @@ import { saveAs } from 'file-saver'
 import './EditableTable.css'
 const EditableContext = React.createContext(null);
 
+const { Option } = Select;
+const { TextArea } = Input;
+
 function patternValidator(columnName){
   switch(columnName){
     // case 'client': return new RegExp(/^[A-Za-z]+( [0-9]+)*$/) //netix
@@ -133,8 +136,8 @@ const EditableRow = ({ index, ...props }) => {
     
   
     let childNode = children;
-    const { Option } = Select;
-    const { TextArea } = Input;
+    // const { Option } = Select;
+    // const { TextArea } = Input;
     if (editable) {
         childNode = editing ? (
           <Form.Item
@@ -795,7 +798,12 @@ class EditableTable extends React.Component {
       });
       return (
         <div style={{zIndex:"999",position:"absolute",marginTop:"115px",padding:"6px",width:"100%"}}>
-          <div className="errCount" style={{"position":"absolute","marginLeft":"240px","marginTop":"-45px"}}> {this.state.errCount.count+' ['+this.state.errCount.row+']'}</div>
+          <div className="errCount" style={{"position":"absolute","marginLeft":"240px","marginTop":"-51px"}}> {this.state.errCount.count + " error index list : "}
+          
+              <Select type="primary" defaultValue={this.state.errCount.row[0]? this.state.errCount.row[0]:0}>
+                {this.state.errCount.row.map((value)=> <Option key={value} value={value}>{value}</Option>)}
+              </Select>
+          </div>
           <Button
             onClick={this.handleAdd}
             type="primary"
