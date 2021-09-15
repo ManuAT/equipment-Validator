@@ -4,6 +4,7 @@ import {Button,Card} from 'antd';
 
 import EditableTable from './EditableTable'
 import * as XLSX from 'xlsx';
+import Item from 'antd/lib/list/Item';
 // import { api } from './ApiService';
 
 function App() {
@@ -55,12 +56,19 @@ function App() {
     }
     
     // prepare columns list from headers
-    const columns = headers.map(c => ({
-      name: c,
-      selector: c,
-    }));
-
-    setData(list);
+    const columns = headers.map(c => (
+     c
+    ));
+    
+    const requiredList = ["client","deviceId","community","siteName","equipmentName","equipmentType","assetCode","pointsData","roomsData","floorsData","commonAreaData","servingSpaceData","servingToData","servingByData","contractAccountNumber","premiseNo","meterNumber"]
+    const currentListNotIncluded = requiredList.filter(Item=> !columns.includes(Item))
+    const remainingList = Object.fromEntries(
+      currentListNotIncluded.map(key => [key,""])
+    )    
+    console.log(remainingList);
+    const newList = [...list].map(values =>({...values,...remainingList}))
+    console.log(list,newList);
+    setData(newList);
     setColumnsName(columns);
 
 

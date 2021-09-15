@@ -28,14 +28,15 @@ export const api = async () => {
                         console.error('There was an error!', error);
                     })
                     
-   const client = await axios.get(baseUrl+'client', {  })
-                    .then(res => {
-                    // console.log(res);
-                    // console.log(res.data);
-                    return res.data
-                    }).catch(error => {
-                        console.error('There was an error!', error);
-                    })
+//    const client = await axios.get(baseUrl+'client', {  })
+//                     .then(res => {
+//                     // console.log(res);
+//                     // console.log(res.data);
+//                     return res.data
+//                     }).catch(error => {
+//                         console.error('There was an error!', error);
+//                     })
+    const client = ['nectarit','netix']
     // console.log('clientLenght'+client.length);
     // const subcommunity = await axios.get(baseUrl+'subcommunity', {  })
     //                 .then(res => {
@@ -70,8 +71,8 @@ export const api = async () => {
             )
             }
     var deviceId = [];
-    // for(let i=0;i<client.length;i++){
-     deviceId =  deviceId.concat( await axios.get(baseUrl+'device', { params:{domain:'nectarit'} })
+    for(let i=0;i<client.length;i++){
+     deviceId =  deviceId.concat( await axios.get(baseUrl+'device', { params:{domain:client[i]} })
                     .then(res => {
                     // console.log(res);
                     // console.log(res.data);
@@ -80,12 +81,12 @@ export const api = async () => {
                         console.error('There was an error!', error);
                     })
                 )
-                // }
+                }
     var pointData = [];
     var equipmentType = [];
     var pointsData = [];
-    // for(let i=0;i<client.length;i++){
-        pointData = await axios.get(baseUrl+'point', { params:{domain:'nectarit'} })
+    for(let i=0;i<client.length;i++){
+        pointData = await axios.get(baseUrl+'point', { params:{domain:client[i]} })
                         .then(res => {
                         // console.log(res);
                         // console.log(res.data);
@@ -93,9 +94,9 @@ export const api = async () => {
                         }).catch(error => {
                             console.error('There was an error!', error);
                         })
-                equipmentType = equipmentType.concat( pointData.map(item =>({equipName:item.templateName,domain:'nectarit'})) )
-                pointsData = pointData.map(item =>({equipName:item.templateName,domain:'nectarit',point:item.configPoints.map(e=>e.data.pointId)}))
-                    // }
+                equipmentType = equipmentType.concat( pointData.map(item =>({equipName:item.templateName,domain:client[i]})) )
+                pointsData = pointsData.concat( pointData.map(item =>({equipName:item.templateName,domain:client[i],point:item.configPoints.map(e=>e.data.pointId)})))
+                    }
     // console.log(client,subcommunity,community,site,)
 
     // const equipmentType = pointData.map(item =>({equipName:item.templateName,domain:'nectarit'}))

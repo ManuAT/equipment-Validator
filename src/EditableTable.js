@@ -101,9 +101,13 @@ const EditableRow = ({ index, ...props }) => {
             const pointData = value.split('@').filter(e=> !selectDropDownValues.pointsData.find(item  =>
               (item.domain == record.client && item.equipName == record.equipmentType)
               ).point.includes(e)) 
-            console.log("value at validation",pointData)
+            // console.log("value at validation",pointData)
             // throw new Error(pointData);
             callback(pointData.join())
+        }
+
+        if (title=='equipmentName' && record.vaildationStatus.includes('equipmentName')) {
+          callback('duplicate equipmentName')
         }
 
         // if(selectDropDownValues.client.find(data => data == record.client)==undefined && title=='client'){
@@ -142,7 +146,7 @@ const EditableRow = ({ index, ...props }) => {
 
             rules={[
               {
-                // required: title == 'client' || title == 'community' || title =='siteName' || title == 'equipmentName' || title =='equipmentType'? true:false,
+                required: title == 'client' || title == 'community' || title =='siteName' || title == 'equipmentName' || title =='equipmentType'? true:false,
                 // pattern: patternValidator(title),
                 message: `error while validation/ required`,
               },
@@ -156,26 +160,26 @@ const EditableRow = ({ index, ...props }) => {
             {
              
               title == 'equipmentType' ? (
-                <Select ref={inputRef} defaultValue={children[1]} style={{ width: "100%" }} onChange={save} onBlur={save} >
+                <Select showSearch ref={inputRef} defaultValue={children[1]} style={{ width: "100%" }} onChange={save} onBlur={save} >
                 {selectDropDownValues["equipmentType"].map((value)=> value.domain == record.client? <Option key={value.equipName} value={value.equipName}>{value.equipName}</Option>:null)}
                 </Select>
               ):(
               
 
               title == 'community' ? (
-                <Select ref={inputRef} defaultValue={children[1]} style={{ width: "100%" }} onChange={save} onBlur={save} >
+                <Select showSearch ref={inputRef} defaultValue={children[1]} style={{ width: "100%" }} onChange={save} onBlur={save} >
                 {selectDropDownValues["community"].map((value)=> value.domain == record.client? <Option key={value.clientName} value={value.clientName}>{value.clientName}</Option>:null)}
                 </Select>
               ):(
 
               title == 'siteName' ? (
-                <Select ref={inputRef} defaultValue={children[1]} style={{ width: "100%" }} onChange={save} onBlur={save} >
+                <Select  showSearch ref={inputRef} defaultValue={children[1]} style={{ width: "100%" }} onChange={save} onBlur={save} >
                 {selectDropDownValues["site"].map((value)=> value.domain == record.client && value.ownerClientId == record.community? <Option key={value.name} value={value.name}>{value.name}</Option>:null)}
                 </Select>
               ): (
 
               title == 'client' || title == 'deviceId' ?( 
-                <Select ref={inputRef} defaultValue={children[1]} style={{ width: "100%" }} onChange={save} onBlur={save} >
+                <Select showSearch ref={inputRef} defaultValue={children[1]} style={{ width: "100%" }} onChange={save} onBlur={save} >
                 {selectDropDownValues[title].map((value)=> <Option key={value} value={value}>{value}</Option>)}
                 </Select>
               
@@ -201,7 +205,7 @@ const EditableRow = ({ index, ...props }) => {
             onClick={toggleEdit}
             >
               {/* {typeof children[1] != "string"? 'noo' : children[1].length>25?children[1].substring(0,25)+"...":children[1]} */}
-              {children[1].length>25?children[1].substring(0,25)+"...":children[1]}
+              {children[1].length>40?children[1].substring(0,40)+"...":children[1]}
               {/* {children} */}
           </div> 
 
@@ -446,7 +450,7 @@ class EditableTable extends React.Component {
           sortDirections: ['descend', 'ascend'],
           render:(_, record)=>{
             const isError = record.vaildationStatus?.includes("pointsData");
-            return <span style={{color:isError?"red":"black"}}>{record.pointsData.substring(0,25)+"..."}</span>
+            return <span style={{color:isError?"red":"black"}}>{record.pointsData.length>25?record.pointsData.substring(0,30)+"...":record.pointsData}</span>
           }
         },
         {
@@ -493,12 +497,24 @@ class EditableTable extends React.Component {
           dataIndex: 'servingToData',
           width: 400,
           editable: true,
+          ...this.getColumnSearchProps('servingToData'),
           sorter: (a, b) => a.servingToData.length - b.servingToData.length,
           sortDirections: ['descend', 'ascend'],
           // render:(_, record)=>{
           //   const isError = !record.servingToData.split('@').every(item => this.selectDropDownValuesForService.includes(item));
           //   return <span style={{color:isError?"red":"black"}}>{record.servingToData.substring(0,25)+"..."}</span>
           // }
+        },
+
+        {
+          title: 'servingSpaceData',
+          dataIndex: 'servingSpaceData',
+          width: 400,
+          editable: true,
+          ...this.getColumnSearchProps('servingSpaceData'),
+          sorter: (a, b) => a.servingSpaceData.length - b.servingSpaceData.length,
+          sortDirections: ['descend', 'ascend'],
+         
         },  
         {
           title: 'servingByData',
@@ -602,7 +618,7 @@ class EditableTable extends React.Component {
     ];
 
     intialValidation = (record,data)=>{
-      const equipmentTypeList = data.map(item => item.equipmentName)
+     
 
       let validationArray = []
       for (let [key, value] of Object.entries(record)) {
@@ -610,7 +626,9 @@ class EditableTable extends React.Component {
 
       //     validationArray.push(key)
       //   }
-        if(equipmentTypeList.indexOf(record.equipmentName) != equipmentTypeList.lastIndexOf(record.equipmentName) && key == 'equipmentName'){
+        if(key == 'equipmentName'){
+          const equipmentTypeList = data.map(item => item.equipmentName)
+          if(equipmentTypeList.indexOf(record.equipmentName) != equipmentTypeList.lastIndexOf(record.equipmentName))
           validationArray.push(key)
         }
 
@@ -685,6 +703,7 @@ class EditableTable extends React.Component {
         premiseNo: "",
         roomsData: "",
         servingByData: "",
+        servingSpaceData : "",
         servingToData: "",
         siteName: "",
         vaildationStatus:[]
@@ -724,7 +743,14 @@ class EditableTable extends React.Component {
         Author: "Manu",
         CreatedDate: new Date(2021,8,27)
         };
-    
+
+        // title == 'client' || title == 'community' || title =='siteName' || title == 'equipmentName' || title =='equipmentType'
+        let checkBeforeDownload = this.state.dataSource.filter(value => value.client ===''|| value.community ==='' || value.siteName === ''||value.equipmentName ===''||value.equipmentType === "")
+        // console.log("null"+checkBeforeDownload);
+        if (checkBeforeDownload.length>0){
+          checkBeforeDownload = checkBeforeDownload.map(x=> this.state.dataSource.indexOf(x)+1)
+          alert("Empty value at required fields on index :  \n"+checkBeforeDownload)
+        }
         wb.SheetNames.push("sheet1");
         var rowData = [].concat(this.state.dataSource)
         var ws = XLSX.utils.json_to_sheet(rowData.map(({key,vaildationStatus, ...remainingAttrs}) => remainingAttrs));
@@ -737,7 +763,7 @@ class EditableTable extends React.Component {
             return buf;    
           }
           saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'test.xlsx');
-          localStorage.removeItem('api')
+          // localStorage.removeItem('api')
 }
 
     render() {
