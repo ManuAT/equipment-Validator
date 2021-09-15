@@ -106,7 +106,7 @@ function App() {
     <div>
     <div className="headerClass">
       <div className="header_title__10x6m">
-      Nectar Onboarding Validator
+      Nectar Onboarding Validator Beta.ver 0.4
       </div>
     </div>
       
