@@ -98,11 +98,10 @@ const EditableRow = ({ index, ...props }) => {
       try {
        if (title=='pointsData' && record.vaildationStatus.includes('pointsData')) {
         
-            const pointData = value.split('@').filter(e=> !selectDropDownValues.pointsData.map(item  =>{
-              if(item.domain == record.client && item.equipName == record.equipmentType)
-              return item.point
-            } ).includes(e)) 
-            // console.log("value at validation",pointData)
+            const pointData = value.split('@').filter(e=> !selectDropDownValues.pointsData.find(item  =>
+              (item.domain == record.client && item.equipName == record.equipmentType)
+              ).point.includes(e)) 
+            console.log("value at validation",pointData)
             // throw new Error(pointData);
             callback(pointData.join())
         }
@@ -155,11 +154,7 @@ const EditableRow = ({ index, ...props }) => {
 
           >
             {
-              title == 'pointsData' ? (
-              
-                <TextArea style={{ width: '370px' }}  ref={inputRef} onPressEnter={save} onFocus={handeleValidate} onBlur={save} autoSize /> 
-            
-              ):(
+             
               title == 'equipmentType' ? (
                 <Select ref={inputRef} defaultValue={children[1]} style={{ width: "100%" }} onChange={save} onBlur={save} >
                 {selectDropDownValues["equipmentType"].map((value)=> value.domain == record.client? <Option key={value.equipName} value={value.equipName}>{value.equipName}</Option>:null)}
@@ -191,7 +186,7 @@ const EditableRow = ({ index, ...props }) => {
               )
               )
               )
-              )
+              
             }
 
             
@@ -572,7 +567,7 @@ class EditableTable extends React.Component {
 
       // addind validation to inputing data
       var dataInputFromFile = this.props.data.map(obj=> ({ ...obj, key: uuidv4() }))
-      dataInputFromFile = [...dataInputFromFile].map(obj => ({...obj,vaildationStatus:this.intialValidation(obj,dataInputFromFile)}))
+      dataInputFromFile = [...dataInputFromFile].map(obj => ({...obj,vaildationStatus:this.intialValidation(obj,dataInputFromFile),assetCode:obj.assetCode.toString().padStart(7,'0')}))
       var errCount = {count:0,row:[]}
       dataInputFromFile.forEach(element => {
         if (element.vaildationStatus.length>0)  {errCount.count+=element.vaildationStatus.length
@@ -639,7 +634,7 @@ class EditableTable extends React.Component {
           validationArray.push(key)
          }
 // !record.pointsData.split('@').every(item => this.selectDropDownValues.pointsData.map(e=>e.point)).includes(item) &&
-         if(this.selectDropDownValues.pointsData.find(value => value.equipName == record.equipmentType && value.domain == record.client && record.pointsData.split('@').every(item =>value.point == item))==undefined && key=='pointsData'){
+         if(this.selectDropDownValues.pointsData.find(value => value.equipName == record.equipmentType && value.domain == record.client && record.pointsData.split('@').every(item =>value.point.includes(item)))==undefined && key=='pointsData'){
           validationArray.push(key)
          }
     }
